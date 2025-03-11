@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>RPG - Dragon Repeller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game">
+  <div id="stats">
+    <span class="stat">XP: <strong><span id="xpText">0</span><span id="displayXpReq">/10</span></strong></span>
+    <span class="stat">Level: <strong><span id="levelText">0</span></strong></span>
+    <span class="stat">Health: <strong><span id="healthText">100</span><span id="displayMaxHealth">/100</span></strong></span>
+    <span class="stat">Gold: <strong><span id="goldText">50</span></strong></span>
+  </div>
+  <div id="controls">
+    <button id="town">Start</button>
+    <div id="mainButtons">
+      <button id="button1">Go to store</button>
+      <button id="button2">Go to cave</button>
+      <button id="button3">Fight dragon</button>
+    </div>
+    <div id="secondButtons">
+      <button id="button4">Level up</button>
+      <button id="button5">Inventory</button>
+      <button id="button6">Back</button>
+    </div>
+  </div>
+  <div id="monsterStats">
+    <span class="stat">Monster Name: <strong><span id="monsterName"></span></strong></span>
+    <span class="stat">Health: <strong><span id="monsterHealth"></span></strong></span>
+    <span class="stat">ATK: <strong><br><span id="monsterATK"></span></strong></span>
+    <span class="stat">DEF: <strong><br><span id="monsterDEF"></span></strong></span>
+    <span class="stat">AG: <strong><br><span id="monsterAG"></span></strong></span>
+  </div>
+  <div id="text">Welcome to the Shattered Hollow. A forgotten place where silence hides lurking dangers. Trust nothing, fear everything, and survive the hunger that waits in the shadows.</div>
+</div>
+<div>
+    <div id="visual"><img src="./Images/Nerd.png" alt="" id="image"></div>
+</div>
+<div id="playerStats">
+  <button id="displayStatsButton">Display player stats / Refresh status</button>
+  <div id="statDisplay">
+    <p id="displayHealth">Health : 100</p>
+    <p id="displayStatPoints">Available stat points: 0</p>
+    <p id="displayST">ST : 1</p>
+    <button id="STPlus" class="incrementer">Increase Stat</button>
+    <p id="displayDEF">DEF : 0</p>
+    <button id="DEFPlus" class="incrementer">Increase Stat</button>
+    <p id="displayAG">AG : 1</p>
+    <button id="AGPlus" class="incrementer">Increase Stat</button>
+    <p id="displayINT">INT : 0</p>
+    <button id="INTPlus" class="incrementer">Increase Stat</button>
+    <p id="displayCritR">CRIT Rate : 0%</p>
+    <p id="displayCritATK">CRIT ATK : 0%</p>
+  </div>
+</div>
+<script type="module" src="long.js"></script>
+<script type="module" src="locations.js"></script>
+<script type="module" src="variables.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+
+</html>
