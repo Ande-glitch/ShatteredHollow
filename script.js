@@ -1,13 +1,31 @@
-import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables} from "./locations.js";
+import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, weaponDisplay} from "./locations.js";
 import { mainButtons, checkCrit, ownerShip, endgameCheck, materialOwnership, playerStatus } from "./variables.js";
 
     let check = null;
-    let invenCheck = null
-    let rareMobChance = null
     let boosted = false;
+    let empowered = false;
+    let armored = false;
+    let bloodBorne = false
+    let atkBuffed = false
+    let defBuffed = false
+    let critBuffed = false
     let ATKweak = 0;
     let DEFweak = 0;
     let AGweak = 0;
+    let treasureChest = 0;
+    let fortuneGems = 0;
+    let healingStones = 0;
+    let haveReset = true;
+    let ATKBuff = 0
+    let DEFBuff = 0
+    let CRITBuff = 0
+    let potionAtk = 0
+    let potionDef = 0;
+    let potionCrit = 0;
+    let boostedApplied = false;
+    let empoweredApplied = false;
+    let armoredApplied = false;
+    let buffed = false;
 
 //Initiate buttons 
 mainButtons.town.onclick = startAdventure;
@@ -59,16 +77,16 @@ function startAdventure() {
         playerStatus.health = 150;
         playerStatus.maxHealth = 150;
         playerStatus.statPoints = 5;
-        playerStatus.gold = 30000;
+        playerStatus.gold = 400;
     
-        playerStatus.critATK = 25
-        playerStatus.critRate = 75
+        playerStatus.critATK = 50
+        playerStatus.critRate = 20
         
         playerStatus.st = 2;
-        playerStatus.def = 4;
+        playerStatus.def = 3;
         playerStatus.ag = 11;
         playerStatus.int = 10;
-        playerStatus.luck = 100;
+        playerStatus.luck = 50;
 
         bardClass.addEventListener("dblclick", function() {
             update(town[0])
@@ -79,19 +97,20 @@ function startAdventure() {
     })
 
     ranger.addEventListener("click", function() {
-        text.textContent = "The Bard Path! An atypical choice indeed, but fitting for the player. You may be bestowed upon you fortune more often than not, but your offensive capabilties are severly weak. (Display more detailed stats in 'Display player stats' down below)"
-        playerStatus.health = 150;
-        playerStatus.maxHealth = 150;
+        text.textContent = "The Ranger Path! A versatile choice for those who favor a balanced playstyle. Your stats are balanced with a great balance between critical chance and strike. (Display more detailed stats in 'Display player stats' down below)"
+        playerStatus.health = 225;
+        playerStatus.maxHealth = 225;
         playerStatus.statPoints = 5;
-        playerStatus.gold = 350;
+        playerStatus.gold = 500;
     
-        playerStatus.critATK = 25
-        playerStatus.critRate = 75
+        playerStatus.critATK = 75
+        playerStatus.critRate = 35
         
-        playerStatus.st = 2;
+        playerStatus.st = 4;
         playerStatus.def = 4;
-        playerStatus.ag = 11;
+        playerStatus.ag = 8;
         playerStatus.int = 10;
+        playerStatus.luck = 10;
 
         rangerClass.addEventListener("dblclick", function() {
             update(town[0])
@@ -102,9 +121,6 @@ function startAdventure() {
     })
 
     mainButtons.mainButtonsHud.style.display = "block"
-    // mainButtons.levelButton.style.display = "inline"
-    // mainButtons.Inventory.style.display = "inline"
-    // mainButtons.backButton.style.display = "inline"
 
     check = town[0]
 }
@@ -136,15 +152,16 @@ export function warriorSelect() {
     playerStatus.health = 250;
     playerStatus.maxHealth = 250;
     playerStatus.statPoints = 5;
-    playerStatus.gold = 125;
+    playerStatus.gold = 300;
 
-    playerStatus.critATK = 100
+    playerStatus.critATK = 125
     playerStatus.critRate = 20
 
     playerStatus.st = 10;
     playerStatus.def = 7;
     playerStatus.ag = 5;
     playerStatus.int = 4;
+    playerStatus.luck = 5;
     
     mainButtons.shopButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -156,19 +173,20 @@ export function warriorSelect() {
     })
 }
 export function mageSelect() {
-    text.textContent = "You have chosen the Mage Path! You specialize in great precision and mystic spellcasting, beware of being hit, as a sorcerer defense is not your greatest suit, but striking hard and fast is. (Display more detailed stats in 'Display player stats' down below)"
+    text.textContent = "You have chosen the Mage Path! You specialize in great precision and mystic spellcasting, beware of being hit, as a sorcerer, defense is not your greatest suit, but striking hard and precise is. (Display more detailed stats in 'Display player stats' down below)"
     playerStatus.health = 175;
     playerStatus.maxHealth = 175;
     playerStatus.statPoints = 5;
-    playerStatus.gold = 200;
+    playerStatus.gold = 775
 
     playerStatus.critATK = 175
-    playerStatus.critRate = 40
+    playerStatus.critRate = 15
     
-    playerStatus.st = 3;
-    playerStatus.def = 2;
-    playerStatus.ag = 7;
+    playerStatus.st = 4;
+    playerStatus.def = 0;
+    playerStatus.ag = 2;
     playerStatus.int = 14;
+    playerStatus.luck = 0;
 
     mainButtons.dungeonButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -184,15 +202,16 @@ export function rogueSelect() {
     playerStatus.health = 180;
     playerStatus.maxHealth = 180;
     playerStatus.statPoints = 5;
-    playerStatus.gold = 500;
+    playerStatus.gold = 800;
 
     playerStatus.critATK = 80
-    playerStatus.critRate = 10
+    playerStatus.critRate = 50
     
     playerStatus.st = 2;
     playerStatus.def = 0;
     playerStatus.ag = 16;
     playerStatus.int = 8;
+    playerStatus.luck = 30;
 
     mainButtons.bossButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -218,7 +237,7 @@ function levelUp() {
         playerStatus.statPoints += 2;
     
         mainButtons.healthText.textContent = `${playerStatus.health}`;
-        mainButtons.displayMaxHealth.textContent = `/${playerStatus.maxHealth}`;
+        displayMaxHealth.textContent = `/${playerStatus.maxHealth+playerStatus.BonusMaxHealth}`;
     
         mainButtons.xpText.textContent = `${playerStatus.xp}`
         mainButtons.displayXpReq.textContent = `/${playerStatus.xpRequired}`
@@ -261,54 +280,80 @@ export function exchangeStore() {
 //Gameplay functions
 export function attack(monster) {
 
-
     //Defense decimal 
     let monsterDecimalDEF = (monster.def+100)/100
-    let playerDecimalDEF = (playerStatus.def+100)/100;
+    let playerDecimalDEF = ((playerStatus.def+playerStatus.BonusDef)+100)/100;
 
     //Damage formula
-    playerStatus.playerDamage = Math.round((Math.random()*playerStatus.st)/monsterDecimalDEF)+1
+    playerStatus.playerDamage = Math.round((Math.random()*(playerStatus.st+playerStatus.BonusSt))/monsterDecimalDEF)+1
     let monsterDamage = Math.round((Math.random()*monster.atkPower)/playerDecimalDEF)
 
     //Speed formula
-    let playerSpeed = Math.round(Math.random()*playerStatus.ag)+1
+    let playerSpeed = Math.round(Math.random()*(playerStatus.ag+playerStatus.BonusAg))+1
     let monsterSpeed = Math.round(Math.random()*monster.ag)+1
     console.log(`Your speed is ${playerSpeed}`);
     console.log(`Monster speed is ${monsterSpeed}`);
 
     //IntCrit formula
-    playerStatus.intDecimal = (playerStatus.int + 100) / 100;
+    playerStatus.intDecimal = ((playerStatus.int+playerStatus.BonusInt) + 100) / 100;
     playerStatus.intCritRate = playerStatus.critRate * playerStatus.intDecimal;
     playerStatus.intCritATK = playerStatus.critATK * playerStatus.intDecimal; //100*1.01 = 101
     let intCritATKDecimal = (playerStatus.intCritATK+100)/100 //101+100=201 // 201/100
 
+    //Luck formula
+    let luckDecimal = (playerStatus.luck+100)/100
+
+    //Buffs
+    if (boosted === true && boostedApplied === false) {
+        playerStatus.playerDamage *= 1.5;
+        boostedApplied = true;
+    }
+    if (empowered === true && empoweredApplied === false) {
+        playerStatus.playerDamage *= 1.75;
+        empoweredApplied = true;
+    }
+    if (armored === true && armoredApplied === false) {
+        playerDecimalDEF+=7.5
+        armoredApplied = true;
+        buffed = true
+    }
+    
     //Crit formula
     console.log("Damage before crit: ", playerStatus.playerDamage);
     let critATKDecimal = intCritATKDecimal
     let critRoll = Math.round(Math.random()*100)
-
-    if (playerStatus.intCritRate >= critRoll) {
-    playerStatus.playerDamage *= critATKDecimal; 
-    checkCrit.achievedCrit = true;
+    let sparkRoll = Math.round(Math.random()*10000)
+    
+    console.log(playerStatus.intCritRate);
+    
+    let achivedSparks = false;
+    if (playerStatus.intCritRate >= sparkRoll) {
+        playerStatus.playerDamage = Math.pow(playerStatus.playerDamage, 1.5)
+        achivedSparks = true
     }
-
-    //Luck formula
-    let luckDecimal = (playerStatus.luck+100)/100
-
-    if (boosted === true) {
-        playerStatus.playerDamage *= 1.5;
+    if (playerStatus.intCritRate >= critRoll && achivedSparks === false) {
+        playerStatus.playerDamage *= critATKDecimal; 
+        checkCrit.achievedCrit = true;
     }
-
+    
+    if (bloodBorne === true) {
+        critRoll /= 1.25
+        sparkRoll /= 1.25
+        buffed = true
+    }
+    console.log("Critroll: "+critRoll);
+    console.log("Sparkroll: "+sparkRoll);
     //Attack (Speed match)
-    if (playerSpeed > monsterSpeed && checkCrit.achievedCrit == true) {
+    if (playerSpeed > monsterSpeed && checkCrit.achievedCrit === true) {
         monster.health -= playerStatus.playerDamage
+        checkCrit.achievedCrit = false
         mainButtons.text.innerHTML = `
         Player Advantage! (Monster Attack evaded)<br>
         CRIT! ${critATKDecimal.toFixed(2)}x You hit for ${Math.round(playerStatus.playerDamage)}HP!
         `
         mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
     }
-    else if (playerSpeed > monsterSpeed && checkCrit.achievedCrit == false) {
+    if (playerSpeed > monsterSpeed && checkCrit.achievedCrit === false) {
         monster.health -= playerStatus.playerDamage
         mainButtons.text.innerHTML = `
         Player Advantage! (Monster Attack evaded)<br>
@@ -316,35 +361,43 @@ export function attack(monster) {
         `
         mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
     }
-    else if (playerSpeed < monsterSpeed && checkCrit.achievedCrit == true) {
-        playerStatus.health -= monsterDamage
-        monster.health -= (playerStatus.playerDamage)/2
+    else if (achivedSparks === true) {
+        monster.health -= playerStatus.playerDamage
+        achievedCrit = false
         mainButtons.text.innerHTML = `
-        Monster Advantage! (Monster attack recieved, Player attack halved)<br>
-        CRIT! ${critATKDecimal.toFixed(2)}x, You hit for ${Math.round(playerStatus.playerDamage/2)}HP! 
+        Player Advantage! (Monster Attack evaded)<br>
+        ULTRA CRIT! ${critATKDecimal.toFixed(2)}x You hit for ${Math.round(playerStatus.playerDamage)}HP!
         `
         mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
-        mainButtons.healthText.textContent = `${Math.round(playerStatus.health)}`
     }
-    else if (playerSpeed < monsterSpeed && checkCrit.achievedCrit == false) {
+    else if (playerSpeed < monsterSpeed && checkCrit.achievedCrit === true) {
+        monster.health -= playerStatus.playerDamage/2
+        checkCrit.achievedCrit = false
         playerStatus.health -= monsterDamage
-        monster.health -= (playerStatus.playerDamage)/2                            
         mainButtons.text.innerHTML = `
-        Monster Advantage! (Monster attack recieved, Player attack halved)<br>
-        You hit for ${Math.round(playerStatus.playerDamage/2)}HP!
+        Monster advantage! (player recieved damage, player attack halved)<br>
+        CRIT! ${critATKDecimal.toFixed(2)}x You hit for ${Math.round(playerStatus.playerDamage)/2}HP!
         `
         mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
-        mainButtons.healthText.textContent = `${Math.round(playerStatus.health)}`
+        healthText.textContent = `${Math.round(playerStatus.health)}`
+    }
+    else if (playerSpeed < monsterSpeed && checkCrit.achievedCrit === false) {
+        monster.health -= playerStatus.playerDamage/2
+        playerStatus.health -= monsterDamage
+        mainButtons.text.innerHTML = `
+        Monster advantage! (Player recieved damage, player attack halved)<br>
+        You hit for ${Math.round(playerStatus.playerDamage)/2}HP!
+        `
+        mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
+        healthText.textContent = `${Math.round(playerStatus.health)}`
     }
     else if (playerSpeed == monsterSpeed) {
         text.textContent = `Speed is equal, both attacks were negated.`
     }
-    else {
-        text.textContent = `Not intended`
-    }
 
     //Monster death
     if (monster.health <= 0) {
+        checkCrit.achievedCrit = false
         //Rewards
         let goldGain = Math.round(Math.random()* (monster.goldReward) *luckDecimal)
         playerStatus.gold += goldGain;
@@ -354,38 +407,113 @@ export function attack(monster) {
         playerStatus.xp += xpGain;
         mainButtons.xpText.textContent = playerStatus.xp
 
+        let rareDropChance = Math.round(Math.random()*100)
+
+        if (rareDropChance >= monster.rareDropChance) {
+            monster.rareDrop()
+        }
+
+        if (boosted === true) {
+            playerStatus.playerDamage /= 1.5; // Revert the damage buff
+            boostedApplied = false;
+            boosted = false;
+        }
+
+        if (durationEm > 0) {
+            durationEm--
+        }
+        if (durationAr > 0) {
+            durationAr--
+        }
+        if (durationBB > 0) {
+            durationBB--
+        }
+        if (durationEm <= 0 && empowered === true) {
+            empowered = false
+            playerStatus.playerDamage /= 1.75; // Revert the empowered damage buff
+            empoweredApplied = false
+        }
+        if (durationAr <= 0 && armored === true) {
+            armored = false  
+            playerDecimalDEF -= 7.5
+            armoredApplied = false          
+        }
+        if (durationBB <= 0 && bloodBorne === true) {
+            bloodBorne = false  
+            critRoll *= 1.25
+            sparkRoll *= 1.25
+        }
+
         if (ATKweak > 0) {
             ATKweak--;
+        }
+        if (ATKBuff > 0) {
+            ATKBuff--
         }
         if (DEFweak > 0) {
             DEFweak--;
         }
+        if (DEFBuff > 0) {
+            DEFBuff--;
+        }
         if (AGweak > 0) {
             AGweak--;
         }
+        if (CRITBuff > 0) {
+            CRITBuff--;
+        }
 
-        if (ATKweak > 0 || DEFweak > 0 || AGweak > 0) {
-            alert(`${ATKweak}x ATK Down, ${DEFweak}x DEF Down, ${AGweak}x AG Down`)
+        if (ATKweak > 0 || DEFweak > 0 || AGweak > 0 || durationEm > 0 || durationAr > 0 || durationBB > 0 || ATKBuff > 0 || DEFBuff > 0 || CRITBuff > 0) {
+            alert(`${ATKweak}x ATK Down, ${DEFweak}x DEF Down, ${AGweak}x AG Down \n${durationEm}x Empowerment stacks, ${durationAr}x Armored stacks, ${durationBB}x Bloodborne stacks \n${ATKBuff}x Player ATK++, ${DEFBuff}x Player DEF++, ${CRITBuff}x Player CRIT++`)
         }
 
         if (ATKweak == 0) {
             monster.atkPower = monster.peakATKPower;
         }
+        if (ATKBuff == 0 && atkBuffed === true) {
+            playerStatus.st -= 10;
+            playerStatus.ag -= 10;
+            atkBuffed = false
+        }
         if (DEFweak == 0) {
             monster.def = monster.peakDef;
+        }
+        if (DEFBuff == 0 && defBuffed === true) {
+            playerStatus.def -= 20;
+            defBuffed = false
         }
         if (AGweak == 0) {
             monster.ag = monster.peakAg;
         }
+        if (CRITBuff == 0 && critBuffed === true) {
+            playerStatus.int -= 20;
+            critBuffed = false
+        }
 
         alert(`+${goldGain} Gold\n+${xpGain}XP`)
+        let rollDrop = Math.round(Math.random()*(100)*luckDecimal)
+        let materialDrop = Math.round(Math.random()*(100)*luckDecimal)
+        let amountTreasure = Math.round(Math.random()*(monster.treasureYield)*luckDecimal)
+        if (rollDrop > 99) {
+            fortuneGems += amountTreasure;
+            alert(`You gained ${amountTreasure}x Fortune gems!`)
+        } else if (rollDrop > 66) {
+            healingStones += amountTreasure;
+            alert(`You gained ${amountTreasure}x Health stones!`)
+        } else if (rollDrop > 33) {
+            treasureChest += amountTreasure;
+            alert(`You gained ${amountTreasure}x Treasure chests!`)
+        }
+        if (materialDrop >= monster.materialDropChance) {
+            monster.materialDrop();
+        }
         //Reset encounter
         update(dungeon[0])
         monster.health = monster.peakHealth;
         mainButtons.monsterStats.style.display = "none"
         mainButtons.monsterName.style.display = "none"
         mainButtons.monsterHealth.style.display = "none"
-
+        check = dungeon[0]
         console.clear()
     }
     
@@ -417,19 +545,6 @@ export function defend(monster) {
         text.innerHTML = `MITIGATED: ${playerProcentDEF}% of the attack! <br>
                           DAMAGE TAKEN: ${monsterDamage}HP`
     
-        //Monster death
-        if (monster.health <= 0) {
-            alert("test")
-            //Reset encounter
-            update(dungeon[0])
-            monster.health = monster.peakHealth;
-            mainButtons.monsterStats.style.display = "none"
-            mainButtons.monsterName.style.display = "none"
-            mainButtons.monsterHealth.style.display = "none"
-            //Rewards
-            playerStatus.gold += monster.goldReward;
-            mainButtons.goldText.textContent = playerStatus.gold;
-        }
 }
 export function run() {
     update(town[0])
@@ -459,19 +574,19 @@ export function fightSlime() {
     let rareMobChance = Math.round(Math.random()*(100)*luckDecimal)
     console.log("You rolled ", rareMobChance, " To get a rare encounter");
 
-    if (rareMobChance > 0) {
-        update(monsters[1])
+    if (rareMobChance > 90) {
+        update(rare[0])
         mainButtons.monsterStats.style.display = "flex"
         mainButtons.monsterName.style.display = "flex"
         mainButtons.monsterHealth.style.display = "flex"
     
-        monsterHealth.textContent = monsters[1].peakHealth
-        monsterName.textContent = monsters[1].name
-        monsterDEF.textContent = monsters[1].def
-        monsterATK.textContent = monsters[1].atkPower
-        monsterAG.textContent = monsters[1].ag
+        monsterHealth.textContent = rare[0].peakHealth
+        monsterName.textContent = rare[0].name
+        monsterDEF.textContent = rare[0].def
+        monsterATK.textContent = rare[0].atkPower
+        monsterAG.textContent = rare[0].ag
     
-        check = monsters[1]
+        check = rare[0]
     }
     else {
         update(monsters[0])
@@ -489,6 +604,20 @@ export function fightSlime() {
     }
 }
 export function fightFang() {
+    update(monsters[1])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[1].peakHealth
+    monsterName.textContent = monsters[1].name
+    monsterDEF.textContent = monsters[1].def
+    monsterATK.textContent = monsters[1].atkPower
+    monsterAG.textContent = monsters[1].ag
+
+    check = monsters[1]
+}
+export function fightGargoyle() {
     update(monsters[2])
     mainButtons.monsterStats.style.display = "flex"
     mainButtons.monsterName.style.display = "flex"
@@ -502,46 +631,194 @@ export function fightFang() {
 
     check = monsters[2]
 }
-export function fightGargoyle() {
-    update(monsters[0])
-    check = monsters[0]
+export function fightGolem() {
+    update(monsters[3])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[3].peakHealth
+    monsterName.textContent = monsters[3].name
+    monsterDEF.textContent = monsters[3].def
+    monsterATK.textContent = monsters[3].atkPower
+    monsterAG.textContent = monsters[3].ag
+
+    check = monsters[3]
 }
-export function fightA() {
-    update(monsters[0])
-}
-export function fightB() {
-    update(monsters[0])
+export function fightMagus() {
+    update(monsters[4])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[4].peakHealth
+    monsterName.textContent = monsters[4].name
+    monsterDEF.textContent = monsters[4].def
+    monsterATK.textContent = monsters[4].atkPower
+    monsterAG.textContent = monsters[4].ag
+
+    check = monsters[4]
 }
 export function fightC() {
     update(monsters[0])
 }
 //Rare drops
 export function gainSlimeSuit() {
-    
+    if (ownerShip.ownedSlime === false) {
+        alert("You found the coveted slime drapes. Max HP+100, DEF+10")
+        playerStatus.BonusMaxHealth += 100
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusDef += 10
+        ownerShip.ownedSlime = true   
+    }
+}
+export function gainTreasureSlimeTreasure() {
+    if (ownerShip.ownedTreasureSlime === false) {
+        alert("You have gained treasure slime's treasure. Max HP+50, All stats+2, Gold gained +10%")
+        playerStatus.BonusMaxHealth += 50
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusSt += 2
+        playerStatus.BonusDef += 2
+        playerStatus.BonusAg += 2
+        playerStatus.BonusInt += 2
+        playerStatus.luck += 2
+        monsters.forEach(monster => {
+            monster.goldReward *= 1.1
+        })
+        ownerShip.ownedSlime = true   
+    }
 }
 export function gainWolfSoul() {
-    
+    if (ownerShip.ownedWolf === false) {
+        alert("From the spirit of the wolf, you gained the wolf soul. ST+3, AG+6, INT+3")
+        playerStatus.BonusSt += 3
+        playerStatus.BonusAg += 6
+        playerStatus.BonusInt += 3
+        ownerShip.ownedWolf = true   
+    }
+}
+export function gainGargoyle() {
+    if (ownerShip.ownedGargoyle === false) {
+        alert("As the gargoyle shatters into pieces, it reveals a hollow helmet, you gained Gargoyle helmet. ST+5, DEF+8, INT+8,")
+        playerStatus.BonusSt += 5
+        playerStatus.BonusDef += 8
+        playerStatus.BonusInt += 8
+        ownerShip.ownedGargoyle = true   
+    }
 }
 export function gainStoneFist() {
-    
+    if (ownerShip.ownedGolem === false) {
+        alert("The golem crumbles and reveals a hidden gemstone, Max HP+150, ST+4, DEF+2, INT+2")
+        playerStatus.BonusMaxHealth += 150
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusSt += 4
+        playerStatus.BonusDef += 2
+        playerStatus.BonusInt += 2
+        ownerShip.ownedGolem = true   
+    }
 }
 export function gainScepter() {
-    
+    if (ownerShip.ownedMagus === false) {
+        alert("The magus drops his scepter. You gained Scepter. ST+3, DEF+3, AG+1, INT+15")
+        playerStatus.BonusMaxHealth += 150
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusSt += 3
+        playerStatus.BonusDef += 3
+        playerStatus.BonusAg += 15
+        playerStatus.BonusInt += 15
+        ownerShip.ownedMagus = true   
+    }
 }
 export function gainDetermination() {
-    
+    if (ownerShip.ownedD === false) {
+        alert("The dragon's demise fills you with determination. Determination to face the future. Max HP+150, All stats+10, XP gained from battles +40%")
+        playerStatus.BonusMaxHealth += 150
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusSt += 10
+        playerStatus.BonusDef += 10
+        playerStatus.BonusAg += 10
+        playerStatus.BonusInt += 10
+        monsters.forEach(monster => {
+            monster.xpYield *= 1.4
+        })
+        ownerShip.ownedD = true   
+    }
 }
 //Material
 export function gainSlimeMats() {
-    
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(9)*luckDecimal);
+    materialOwnership.materialSlimeOwned += amount
+    alert(`You gained ${amount}x Slime materials!`)
 }
 export function gainWolfMats() {
-
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(4)*luckDecimal);
+    materialOwnership.materialWolfOwned += amount
+    alert(`You gained ${amount}x Wolf materials!`)
+}
+export function gainGarMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(4)*luckDecimal);
+    materialOwnership.materialGargoyleOwned += amount
+    alert(`You gained ${amount}x Wolf materials!`)
 }
 export function gainRockMats() {
-
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(2)*luckDecimal);
+    materialOwnership.materialWolfOwned += amount
+    alert(`You gained ${amount}x Golem materials!`)
 }
 export function gainMagusMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(1)*luckDecimal);
+    materialOwnership.materialWolfOwned += amount
+    alert(`You gained ${amount}x Magus materials!`)
+}
+export function sellMats() {
+    let totalAmount = 0
+    let slimeOw = materialOwnership.materialSlimeOwned
+    let wolfOw = materialOwnership.materialWolfOwned
+    let garOw = materialOwnership.materialGargoyleOwned
+    let rockOw = materialOwnership.materialRockOwned
+    let magusOw = materialOwnership.materialMagusOwned
+
+    if (materialOwnership.materialSlimeOwned > 0) {
+        playerStatus.gold += materialOwnership.materialSlimeOwned * 3
+        totalAmount += materialOwnership.materialSlimeOwned * 3
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialSlimeOwned = 0;
+    }
+    if (materialOwnership.materialWolfOwned > 0) {
+        playerStatus.gold += materialOwnership.materialWolfOwned * 9
+        totalAmount += materialOwnership.materialWolfOwned * 9
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialWolfOwned = 0;
+    }
+    if (materialOwnership.materialGargoyleOwned > 0) {
+        playerStatus.gold += materialOwnership.materialGargoyleOwned * 26
+        totalAmount += materialOwnership.materialGargoyleOwned * 26
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialGargoyleOwned = 0;
+    }
+    if (materialOwnership.materialRockOwned > 0) {
+        playerStatus.gold += materialOwnership.materialRockOwned * 40
+        totalAmount += materialOwnership.materialRockOwned * 40
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialRockOwned = 0;
+    }
+    if (materialOwnership.materialMagusOwned > 0) {
+        playerStatus.gold += materialOwnership.materialMagusOwned * 150
+        totalAmount += materialOwnership.materialMagusOwned * 150
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialMagusOwned = 0;
+    }
+    text.innerHTML = `You gained ${totalAmount}G! You sold:<br>
+    ${slimeOw}x Slime material <br>
+    ${wolfOw}x Wolf material <br>
+    ${garOw}x Gargoyle material <br>
+    ${rockOw}x Golem material <br>
+    ${magusOw}x Magus material <br>`;
 
 }
 
@@ -549,16 +826,16 @@ displayStatsButton.addEventListener("click", function() {
     let pElements = document.querySelectorAll("#statDisplay p");
     let buttonElements = document.querySelectorAll(".incrementer")
 
-    playerStatus.intDecimal = (playerStatus.int + 100) / 100;
+    playerStatus.intDecimal = ((playerStatus.int+playerStatus.BonusInt) + 100) / 100;
     playerStatus.intCritRate = playerStatus.critRate * playerStatus.intDecimal;
     playerStatus.intCritATK = playerStatus.critATK * playerStatus.intDecimal;
 
     mainButtons.displayHealth.textContent = `Health : ${Math.round(playerStatus.health)}`;
     mainButtons.displayStatPoints.textContent = `Available stat points : ${playerStatus.statPoints}`
-    mainButtons.displayST.textContent = `ST : ${playerStatus.st}`;
-    mainButtons.displayDEF.textContent = `DEF : ${playerStatus.def}`;
-    mainButtons.displayAG.textContent = `AG : ${playerStatus.ag}`;
-    mainButtons.displayINT.textContent = `INT : ${playerStatus.int}`
+    mainButtons.displayST.textContent = `ST : ${(playerStatus.st+playerStatus.BonusSt)}`;
+    mainButtons.displayDEF.textContent = `DEF : ${playerStatus.def+playerStatus.BonusDef}`;
+    mainButtons.displayAG.textContent = `AG : ${playerStatus.ag+playerStatus.BonusAg}`;
+    mainButtons.displayINT.textContent = `INT : ${playerStatus.int+playerStatus.BonusInt}`
     mainButtons.displayCritR.textContent = `Crit Rate : ${(playerStatus.intCritRate).toFixed(2)}%`
     mainButtons.displayCritATK.textContent = `Crit ATK : ${(playerStatus.intCritATK).toFixed(2)}%`
     pElements.forEach(p => {
@@ -644,8 +921,8 @@ export function zweiHander() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedZwei = true;
 
-        playerStatus.st += 3
-        playerStatus.def += 2
+        playerStatus.BonusSt += 3
+        playerStatus.BonusDef += 2
 
         text.innerHTML = "Item bought! <br> ST+3 <br> DEF+2"
     }
@@ -659,8 +936,8 @@ export function shortBow() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedShort = true
 
-        playerStatus.st += 1
-        playerStatus.ag += 2
+        playerStatus.BonusSt += 1
+        playerStatus.BonusAg += 2
 
         text.innerHTML = "Item bought! <br> ST+1 <br> AG+2"
     }
@@ -674,8 +951,8 @@ export function magicWand() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedWand = true
 
-        playerStatus.int += 3
-        playerStatus.def += 2
+        playerStatus.BonusInt += 3
+        playerStatus.BonusDef += 2
 
         text.innerHTML = "Item bought! <br> INT+3 <br> DEF+2"
     }
@@ -689,10 +966,10 @@ export function rareKatana() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedKat = true
 
-        playerStatus.st += 5
-        playerStatus.def += 2
-        playerStatus.ag += 2
-        playerStatus.int += 2
+        playerStatus.BonusSt += 5
+        playerStatus.BonusDef += 2
+        playerStatus.BonusAg += 2
+        playerStatus.BonusInt += 2
 
         text.innerHTML = "Item bought! <br> ST+5 <br> DEF+2 <br> AG+2 <br> INT+2"
     }
@@ -706,8 +983,8 @@ export function clayMore() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedClay = true
 
-        playerStatus.st += 7
-        playerStatus.def += 4
+        playerStatus.BonusSt += 7
+        playerStatus.BonusDef += 4
 
         text.innerHTML = "Item bought! <br> ST+7 <br> DEF+4"
     }
@@ -721,8 +998,8 @@ export function gemStaff() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedGem = true
 
-        playerStatus.int += 9
-        playerStatus.def += 4
+        playerStatus.BonusInt += 9
+        playerStatus.BonusDef += 4
 
         text.innerHTML = "Item bought! <br> INT+9 <br> DEF+4"
     }
@@ -736,8 +1013,8 @@ export function greatestSword() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedGreat = true
 
-        playerStatus.st += 14
-        playerStatus.def += 15
+        playerStatus.BonusSt += 14
+        playerStatus.BonusDef += 15
 
         text.innerHTML = "Item bought! <br> ST+14 <br> DEF+15"
     }
@@ -751,9 +1028,9 @@ export function shadowBow() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedShadow = true
 
-        playerStatus.ag += 10
-        playerStatus.int += 6
-        playerStatus.st += 3
+        playerStatus.BonusAg += 10
+        playerStatus.BonusInt += 6
+        playerStatus.BonusSt += 3
 
         text.innerHTML = "Item bought! <br> ST+3 <br> AG+10 <br> INT+6"
     }
@@ -767,10 +1044,10 @@ export function mechanicalStaff() {
         goldText.textContent = playerStatus.gold
         ownerShip.ownedMechanic = true
 
-        playerStatus.ag += 10
-        playerStatus.int += 10
-        playerStatus.st += 10
-        playerStatus.def += 5
+        playerStatus.BonusAg += 10
+        playerStatus.BonusInt += 10
+        playerStatus.BonusSt += 10
+        playerStatus.BonusDef += 5
 
         text.innerHTML = "Item bought! <br> ST+10 <br> DEF+5 <br> AG+10 <br> INT+10"
     }
@@ -781,12 +1058,12 @@ export function mechanicalStaff() {
 export function healPot() {
     let healAmount = 20;
     let newHealth = playerStatus.health + healAmount
-    if (playerStatus.gold >= 30 && playerStatus.health < playerStatus.maxHealth) {
+    if (playerStatus.gold >= 30 && playerStatus.health < (playerStatus.maxHealth+playerStatus.BonusMaxHealth)) {
         playerStatus.health += healAmount
         healthText.textContent = playerStatus.health
         playerStatus.gold -= 20;
-        if (newHealth > playerStatus.maxHealth) {
-            playerStatus.health = playerStatus.maxHealth
+        if (newHealth > (playerStatus.maxHealth+playerStatus.BonusMaxHealth)) {
+            playerStatus.health = (playerStatus.maxHealth+playerStatus.BonusMaxHealth)
             healthText.textContent = playerStatus.health
         }
         goldText.textContent = playerStatus.gold
@@ -794,21 +1071,21 @@ export function healPot() {
     else if (playerStatus.gold < 30) {
         text.textContent = "You don't have enough gold!"
     }
-    else if (playerStatus.health == playerStatus.maxHealth) {
+    else if (playerStatus.health == (playerStatus.maxHealth+playerStatus.BonusMaxHealth)) {
         text.textContent = "Your health is at its maximum."
     }
 }
 export function ATKPot() {
-    if (playerStatus.gold >= 300 && boosted == false) {
+    if (playerStatus.gold >= 1500 && boosted == false) {
         boosted = true;
-        playerStatus.gold -= 300;
+        playerStatus.gold -= 1500;
         goldText.textContent = playerStatus.gold
         text.textContent = "You will deal 50% more damage in the next battle!"
     }
     else if (boosted == true) {
         text.textContent = "You are already boosted!"
     }
-    else if (playerStatus.gold < 300) {
+    else if (playerStatus.gold < 1500) {
         text.textContent = "You don't have enough gold!"
     }
 }
@@ -845,7 +1122,7 @@ export function DEFdebuff() {
         playerStatus.gold -= 1500
         goldText.textContent = playerStatus.gold
     }
-    if (DEFweak == 5) {
+    else if (DEFweak == 5) {
         text.textContent = "You have maximum stacks of this debuff!"
     }
     else if (playerStatus.gold < 1500) {
@@ -873,15 +1150,91 @@ export function AGdebuff() {
 export function buff() {
     update(potions[3])
 }
-export function ATKbuff() {
-    update(potions[3])
+export function buyPower() {
+    if (playerStatus.gold >= 2250) {
+        playerStatus.gold -= 2250
+        goldText.textContent = playerStatus.gold
+        text.textContent = `You have bought a strength enchancing potion! (Available in inventory)`
+        potionAtk++
+    }
+    else {
+        text.textContent = "You don't have enough gold..."
+    }
 }
-export function DEFbuff() {
-    update(potions[3])
+export function buyDef() {
+    if (playerStatus.gold >= 2250) {
+        playerStatus.gold -= 2250
+        goldText.textContent = playerStatus.gold
+        text.textContent = `You have bought a defense enchancing potion! (Available in inventory)`
+        potionDef++
+    }
+    else {
+        text.textContent = "You don't have enough gold..."
+    }
 }
-export function AGbuff() {
-    update(potions[3])
+export function buyCrit() {
+    if (playerStatus.gold >= 2250) {
+        playerStatus.gold -= 2250
+        goldText.textContent = playerStatus.gold
+        text.textContent = `You have bought a critical strike enchancing potion! (Available in inventory)`
+        potionCrit++
+    }
 }
+export function buyReset() {
+    if (playerStatus.gold >= 9999) {
+        haveReset = true
+        playerStatus.gold -= 9999
+        goldText.textContent = playerStatus.gold
+        text.textContent = `You have bought a stat reset potion! (Available in inventory)`
+    }
+}
+export function powerPot() {
+    if (atkBuffed === false && potionAtk > 0) {
+        playerStatus.BonusSt += 10
+        playerStatus.BonusAg += 10
+        atkBuffed = true;
+        text.textContent = `ST+10 and AG+10 / This will last for 5 battles`
+        ATKBuff = 5;
+        potionAtk--
+    }
+    else if (atkBuffed === true) {
+        text.textContent = `You cannot stack this effect.`
+    }
+    else if (potionAtk <= 0) {
+        text.textContent = `You don't have this potion...`
+    }
+}
+export function defPot() {
+    if (defBuffed === false && potionDef > 0) {
+        playerStatus.BonusDef += 20
+        defBuffed = true;
+        text.textContent = `DEF+20 / This will last for 5 battles`
+        DEFBuff = 5;
+        potionDef--
+    }
+    else if (defBuffed === true) {
+        text.textContent = `You cannot stack this effect.`
+    }
+    else if (potionDef <= 0) {
+        text.textContent = `You don't have this potion...`
+    }
+}
+export function critPot() {
+    if (critBuffed === false && potionCrit > 0) {
+        playerStatus.BonusInt += 20
+        critBuffed = true;
+        text.textContent = `INT+20 / This will last for 5 battles`
+        CRITBuff = 5;
+        potionCrit--
+    }
+    else if (critBuffed === true) {
+        text.textContent = `You cannot stack this effect.`
+    }
+    else if (potionCrit <= 0) {
+        text.textContent = `You don't have this potion...`
+    }
+}
+
 export function luckPot() {
     if (playerStatus.gold >= 7777 && playerStatus.luck < 50) {
         playerStatus.gold -= 7777
@@ -896,17 +1249,242 @@ export function luckPot() {
         text.textContent = "Your luck cannot be increased anymore."
     }
 }
+export function lifeEx() {
+    update(exchange[1])
+}
+let durationEm = 0
+export function empowerment() {
+    if (playerStatus.health > 0 && empowered === false) {
+        playerStatus.health -= 50
+        playerStatus.maxHealth -= 50
+        healthText.textContent = playerStatus.maxHealth
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        empowered = true
+        durationEm = 5
+        text.textContent = `You have exchange a portion of your life for the Crimson Empowerment enhancement / 25% increase to player damage`
+    }
+}
+let durationAr = 0
+export function vitalDef() {
+    if (playerStatus.health > 0 && armored === false) {
+        playerStatus.health -= 50
+        playerStatus.maxHealth -= 50
+        healthText.textContent = playerStatus.maxHealth
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        armored = true
+        durationAr = 5
+        text.textContent = `You have exchange a portion of your life for the Vitality Defense enhancement / 75% increase to DEF`
+    }
+}
+let durationBB = 0
+export function borne() {
+    if (playerStatus.health > 0 && bloodBorne === false) {
+        playerStatus.health -= 25
+        playerStatus.maxHealth -= 25
+        healthText.textContent = playerStatus.maxHealth
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        bloodBorne = true
+        durationBB = 5
+        text.textContent = `You have exchange a portion of your life for the Bloodborne enhancement / 25% increase in CRIT chance`
+    }
+}
+export function goldEx() {
+    update(exchange[2])
+}
 export function openInventory() {
     update(inventoryDisplay[0])
 }
 export function openWeapons() {
     update(inventoryDisplay[1])
 }
+export function checkCommon() {
+    update(weaponDisplay[0])
+}
+export function inspectZwei() {
+    if (ownerShip.ownedZwei == true) {
+        text.innerHTML = `"The zweihander. First of the weapons conjured by the great mind and creator of the Shattered Hollow. It serves as a great starting weapon for warriors, and on top of that, is quite easy to access quickly upon selecting the warrior path."
+        <br> Element: Basic 
+        <br> ST Increase: 3+
+        <br> DEF Increase: 2+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectShortbow() {
+    if (ownerShip.ownedShort == true) {
+        text.innerHTML = `"The shortbow, cheapest of the weapons available at the shopkeep's store. Some even ponder whether it is worth buying this mediocre weapon, but due to it's cheap price, and a permanent increase in stats, be it slightly. The shortbow is a great weapon to help "minmax" your build."
+        <br> Element: Basic 
+        <br> ST Increase: 1+
+        <br> AG Increase: 2+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/bow.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectWand() {
+    if (ownerShip.ownedWand == true) {
+        text.innerHTML = `"The wand is a mage's classic choice to begin with spellcasting and magic. It's stats dictate a slight increase in focus and defense. Many beginner mages wonder where the added defensive capabilities come from. However senior mages usually scoff at their questions."
+        <br> Element: Basic 
+        <br> INT Increase: 3+
+        <br> DEF Increase: 2+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function checkRare() {
+    update(inventoryDisplay[1])
+}
+export function inspectKat() {
+    if (ownerShip.ownedKat == true) {
+        text.innerHTML = `"The Eastern katana combines both fear and precision in it's wake. Used by many eastern warriors, it has recently been sparked up in debate whether it or the claymore is superior. For some reason most attendees of debates reside in more western areas"
+        <br> Element: Basic 
+        <br> ST Increase: 5+
+        <br> DEF Increase: 2+
+        <br> AG Increase: 2+
+        <br> INT Increase: 2+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectClay() {
+    if (ownerShip.ownedClay == true) {
+        text.innerHTML = `"The claymore is a powerful weapon, used by many warriors in time of war and battle. Some warriors have sparked debate over whether the claymore or the katana is superior, many of these warriors reside in the western hemisphere."
+        <br> Element: Basic 
+        <br> ST Increase: 7+
+        <br> AG Increase: 4+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectGem() {
+    if (ownerShip.ownedGem == true) {
+        text.innerHTML = `"A staff in which a gemstone adorns the top, it is said the gemstone amplifies focus and gives way to powerful spells, judging from the gameplay however, only one part of the statement is correct."
+        <br> Element: Basic 
+        <br> INT Increase: 9+
+        <br> DEF Increase: 4+
+        <br> ATK Type: Physical Pierce & Slash
+        `
+        mainButtons.visual.src = "./Images/staff.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function checkLeg() {
+    update(inventoryDisplay[1])
+}
+export function inspectGreat() {
+    if (ownerShip.ownedGreat == true) {
+        text.innerHTML = `"Forged from great volcanic elementals, and wielded by legendary warriors of the past, this sword yields to whomever is worthy enough to wield it. (Or whoever who has enough money)"
+        <br> Element: Basic 
+        <br> ST Increase: 14+
+        <br> DEF Increase: 15+
+        <br> ATK Type: Physical Slash
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectShadow() {
+    if (ownerShip.ownedShadow == true) {
+        text.innerHTML = `"The shadow bow symbolizes the darkness in which rangers and rogues alike cloak themselves in. You however embody the shadows. From great wealth comes great stealth"
+        <br> Element: Dark
+        <br> ST Increase: 3+
+        <br> AG Increase: 10+
+        <br> INT Increase: 6+
+        <br> ATK Type: Magical Pierce
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
+export function inspectMech() {
+    if (ownerShip.ownedMechanic == true) {
+        text.innerHTML = `"Many wizards and mages have debated the practicality of this staff, many consider this as a tarnish on wizardry, however it's power is not up for debate, as seen by the Council of Wizardry disbanding soonly after this staff's debut."
+        <br> Element: Chaos, innovation
+        <br> ST Increase: 10+
+        <br> DEF Increase: 5+
+        <br> AG Increase: 10+
+        <br> INT Increase: 10+
+        <br> ATK Type: Explosive, Terror
+        `
+        mainButtons.visual.src = "./Images/output.jpg"
+    }
+    else {
+        text.innerHTML = "You do not own this weapon..."
+    }
+}
 export function openConsumables() {
     update(inventoryDisplay[2])
 }
-export function explosives() {
+export function treasure() {
     update(consumables[0])
+}
+export function useChest() {
+    let amountGold = Math.round(Math.random()*500)
+    if (treasureChest > 0) {
+        treasureChest--
+        playerStatus.gold += amountGold
+        goldText.textContent = playerStatus.gold
+        text.textContent = `You gained ${amountGold}G! You have ${treasureChest}x treasure chests left.`
+    }
+    else {
+        text.textContent = `You don't have any treasure chests left.`
+    }
+}
+export function useHeal() {
+    if (healingStones > 0) {
+        healingStones--
+        playerStatus.maxHealth += 1
+        playerStatus.health += 1
+        healthText.textContent = playerStatus.health
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        text.textContent = `You gained Max HP+3! You have ${healingStones}x health stones left.`
+    }
+    else {
+        text.textContent = `You don't have any healing stones left.`
+    }
+}
+export function useGems() {
+    let amountGold = Math.round(Math.random()*2000)
+    if (fortuneGems > 0) {
+        fortuneGems--
+        playerStatus.maxHealth += 3
+        if (playerStatus.luck < 100) {
+            playerStatus.luck += 1
+        }
+        playerStatus.gold += amountGold
+        healthText.textContent = playerStatus.health
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        goldText.textContent = playerStatus.gold
+        text.textContent = `Luck increased, Max HP+10 and recieved ${amountGold}! You have ${fortuneGems}x fortune gems left.`
+    }
+    else {
+        text.textContent = `You don't have any fortune gems left.`
+    }
 }
 export function statboost() {
     update(consumables[1])
@@ -914,6 +1492,90 @@ export function statboost() {
 export function mystery() {
     update(consumables[2])
 }
+export function resetStats() {
+    if (haveReset === true) {
+        let totalStats = 0;
+        totalStats += playerStatus.st 
+        totalStats += playerStatus.def 
+        totalStats += playerStatus.ag
+        totalStats += playerStatus.int
+        playerStatus.st = 0
+        playerStatus.def = 0
+        playerStatus.ag = 0
+        playerStatus.int = 0
+    
+        playerStatus.statPoints += totalStats
+        totalStats = 0;
+
+        haveReset = false
+    }
+}
+let goldBoosted = false
+export function goldBoost() {
+    if (playerStatus.maxHealth > 150 && goldBoosted === false) {
+        let healthTaken = Math.round(Math.random()* (150 - 100)) + 100
+        console.log(healthTaken);
+        playerStatus.maxHealth -= healthTaken
+        playerStatus.health -= healthTaken
+        healthText.textContent = playerStatus.health
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        text.textContent = `You sacrifice your vitality for the blessing of the God of Wealth. Gold gained from battles 20% increase.`
+        monsters.forEach(monster => {
+            monster.goldReward *= 1.2
+        })
+        goldBoosted = true
+    }
+    else if (playerStatus.maxHealth < 150) {
+        text.textContent = `You don't have enough vitality`
+    }
+    else {
+        text.textContent = `You have already sacrificed enough.`
+    }
+}
+let xpBoosted = false
+export function XPboost() {
+    if (playerStatus.maxHealth > 150 && xpBoosted === false) {
+        let healthTaken = Math.round(Math.random()* (150 - 100)) + 100
+        console.log(healthTaken);
+        playerStatus.maxHealth -= healthTaken
+        playerStatus.health -= healthTaken
+        healthText.textContent = playerStatus.health
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        text.textContent = `You sacrifice your vitality for the blessing of the God of War. Experience gained from battles 10% increase.`
+        monsters.forEach(monster => {
+            monster.xpYield *= 1.1
+        })
+        xpBoosted = true
+    }
+    else if (playerStatus.maxHealth < 150) {
+        text.textContent = `You don't have enough vitality`
+    }
+    else {
+        text.textContent = `You have already sacrificed enough.`
+    }
+}
 export function openKey() {
     update(inventoryDisplay[3])
+}
+export function inspectInsignia() {
+    text.innerHTML = `"An insignia proving your honor as the hero who saved the world."`
+    mainButtons.visual.src = "./Images/Fire.png"
+}
+export function inspectMark() {
+    if (endgameCheck.dragonSlayed === true) {
+    text.innerHTML = `"An otherwordly mark placed on your soul upon defeat of the calamity, a call was heard upon this item's gain..."`
+    mainButtons.visual.src = "./Images/dragon.jpg"
+}
+else {
+    text.textContent = "You haven't obtained this item"
+}
+}
+export function inspectCosmic() {
+    if (endgameCheck.destroyerSlayed == true) {
+        text.innerHTML = `"A glowing relic of cosmic power, gained by triumph over the universal threat, its diminished power serves no benefit to your otherwordly strength, however by tapping into its power you can harness the fabric of space and time and fight once more the plague of reality."`
+        mainButtons.visual.src = "./Images/destroyer.jpg"
+    }
+    else if (endgameCheck.destroyerSlayed == false) {
+        text.innerHTML = `You do not own this artifact`
+    }
 }

@@ -53,24 +53,28 @@ export const mainButtons = {
 };
 
 export const playerStatus = {
-  xp: 1000,
+  xp: 0,
   xpRequired: 10,
   level: 0,
-  statPoints: 10,
-  health: 10000,
+  statPoints: 0,
+  health: 100,
   maxHealth: 100,
-  gold: 50111,
+  BonusMaxHealth: 0,
+  gold: 0,
   playerDamage: null,
-  st: 3,
-  def: 50,
-  ag: 30,
-  int: 1,
+  st: 0,
+  def: 0,
+  ag: 0,
+  int: 0,
+  BonusSt: 0,
+  BonusDef: 0,
+  BonusAg: 0,
+  BonusInt: 0,
   intDecimal: null,
-  critRate: 2000,
+  critRate: 100,
   critATK: 100,
   intCritRate: null,
   intCritATK: null,
-  baseATKChance: 100,
   aquiredWeapons: 0,
   aquiredItems: 0,
   aquiredRare: 0,
@@ -79,7 +83,6 @@ export const playerStatus = {
 
 export const checkCrit = {
   rolledDrop: false,
-  firstInstance: true,
   achievedCrit: false,
 };
 
@@ -93,6 +96,19 @@ export const ownerShip = {
   ownedGreat: false,
   ownedShadow: false,
   ownedMechanic: false,
+
+  ownedSlime: false,
+  ownedTreasureSlime: false,
+  ownedWolf: false,
+  ownedGargoyle: false,
+  ownedGolem: false,
+  ownedMagus: false,
+  ownedA: false,
+  ownedB: false,
+  ownedC: false,
+  ownedD: false,
+
+  ownede: false,
 };
 
 export const endgameCheck = {
@@ -106,8 +122,9 @@ export const endgameCheck = {
 };
 
 export const materialOwnership = {
-  materialSlimeOwned: 8,
-  materialWolfOwned: 22,
-  materialRockOwned: 3,
-  materialMagusOwned: 5,
+  materialSlimeOwned: 0,
+  materialWolfOwned: 0,
+  materialGargoyleOwned: 8,
+  materialRockOwned: 0,
+  materialMagusOwned: 0,
 };
