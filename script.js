@@ -1,4 +1,4 @@
-import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, weaponDisplay} from "./locations.js";
+import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, weaponDisplay, boss, elite} from "./locations.js";
 import { mainButtons, checkCrit, ownerShip, endgameCheck, materialOwnership, playerStatus } from "./variables.js";
 
     let check = null;
@@ -110,7 +110,7 @@ function startAdventure() {
         playerStatus.def = 4;
         playerStatus.ag = 8;
         playerStatus.int = 10;
-        playerStatus.luck = 10;
+        playerStatus.luck = 20;
 
         rangerClass.addEventListener("dblclick", function() {
             update(town[0])
@@ -161,7 +161,7 @@ export function warriorSelect() {
     playerStatus.def = 7;
     playerStatus.ag = 5;
     playerStatus.int = 4;
-    playerStatus.luck = 5;
+    playerStatus.luck = 10;
     
     mainButtons.shopButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -236,7 +236,7 @@ function levelUp() {
 
         playerStatus.statPoints += 2;
     
-        mainButtons.healthText.textContent = `${playerStatus.health}`;
+        mainButtons.healthText.textContent = `${Math.round(playerStatus.health)}`;
         displayMaxHealth.textContent = `/${playerStatus.maxHealth+playerStatus.BonusMaxHealth}`;
     
         mainButtons.xpText.textContent = `${playerStatus.xp}`
@@ -261,7 +261,37 @@ export function goCave() {
     check = locations[1]
 }
 export function goBoss() {
-    update(locations[0])
+    if (playerStatus.level >= 100 && endgameCheck.dragonSlayed === false) {
+        update(boss[0])
+        mainButtons.monsterStats.style.display = "flex"
+        mainButtons.monsterName.style.display = "flex"
+        mainButtons.monsterHealth.style.display = "flex"
+    
+        monsterHealth.textContent = boss[0].peakHealth
+        monsterName.textContent = boss[0].name
+        monsterDEF.textContent = boss[0].def
+        monsterATK.textContent = boss[0].atkPower
+        monsterAG.textContent = boss[0].ag
+    
+        check = boss[0]
+    }
+    else if (endgameCheck.dragonSlayed === true) {
+        update(boss[1])
+        mainButtons.monsterStats.style.display = "flex"
+        mainButtons.monsterName.style.display = "flex"
+        mainButtons.monsterHealth.style.display = "flex"
+    
+        monsterHealth.textContent = boss[1].peakHealth
+        monsterName.textContent = boss[1].name
+        monsterDEF.textContent = boss[1].def
+        monsterATK.textContent = boss[1].atkPower
+        monsterAG.textContent = boss[1].ag
+    
+        check = boss[1]
+    }
+    else {
+        text.textContent = `You are not strong enough to face the calamity of this world. Delve deeper into the dungeon, find power and wealth to strengthen your status.`
+    }
 }
 //Shop functions
 export function weaponShop() {
@@ -278,14 +308,19 @@ export function exchangeStore() {
 }
 
 //Gameplay functions
+
+let countdown = 0
+let oneTime = false
+let bigHit = 0
+
 export function attack(monster) {
 
     //Defense decimal 
-    let monsterDecimalDEF = (monster.def+100)/100
+    let monsterDecimalDEF = ((monster.def+100)/100)
     let playerDecimalDEF = ((playerStatus.def+playerStatus.BonusDef)+100)/100;
 
     //Damage formula
-    playerStatus.playerDamage = Math.round((Math.random()*(playerStatus.st+playerStatus.BonusSt))/monsterDecimalDEF)+1
+    playerStatus.playerDamage = Math.round((Math.random()*(playerStatus.st+playerStatus.BonusSt)/monsterDecimalDEF))
     let monsterDamage = Math.round((Math.random()*monster.atkPower)/playerDecimalDEF)
 
     //Speed formula
@@ -313,7 +348,7 @@ export function attack(monster) {
         empoweredApplied = true;
     }
     if (armored === true && armoredApplied === false) {
-        playerDecimalDEF+=7.5
+        playerDecimalDEF+=0.25
         armoredApplied = true;
         buffed = true
     }
@@ -343,6 +378,25 @@ export function attack(monster) {
     }
     console.log("Critroll: "+critRoll);
     console.log("Sparkroll: "+sparkRoll);
+
+if (monster.class == "danger" || monster.class == "calamity") {
+        if (monster.health <= (monster.peakHealth)/2 && oneTime === false) {
+            alert("Your insticts tell you something dangerous is about to happen!")
+            oneTime = true
+        }
+        if (monster.health <= (monster.peakHealth)/2) {
+            countdown++
+        }
+        if (countdown == 2) {
+            monsterSpeed += monster.ag
+            monsterDamage += monster.peakATKPower*2
+            bigHit++
+        }
+        if (bigHit == 2) {
+            monsterSpeed -= monster.ag
+            monsterDamage -= monster.peakATKPower*2
+        }
+}
     //Attack (Speed match)
     if (playerSpeed > monsterSpeed && checkCrit.achievedCrit === true) {
         monster.health -= playerStatus.playerDamage
@@ -363,7 +417,7 @@ export function attack(monster) {
     }
     else if (achivedSparks === true) {
         monster.health -= playerStatus.playerDamage
-        achievedCrit = false
+        checkCrit.achievedCrit = false
         mainButtons.text.innerHTML = `
         Player Advantage! (Monster Attack evaded)<br>
         ULTRA CRIT! ${critATKDecimal.toFixed(2)}x You hit for ${Math.round(playerStatus.playerDamage)}HP!
@@ -395,6 +449,8 @@ export function attack(monster) {
         text.textContent = `Speed is equal, both attacks were negated.`
     }
 
+    console.log(`Monster hit you for: ${monsterDamage}`);
+
     //Monster death
     if (monster.health <= 0) {
         checkCrit.achievedCrit = false
@@ -407,7 +463,11 @@ export function attack(monster) {
         playerStatus.xp += xpGain;
         mainButtons.xpText.textContent = playerStatus.xp
 
-        let rareDropChance = Math.round(Math.random()*100)
+        oneTime = false
+        countdown = 0
+        bigHit = 0
+
+        let rareDropChance = Math.round(Math.random()*100)+playerStatus.luck
 
         if (rareDropChance >= monster.rareDropChance) {
             monster.rareDrop()
@@ -507,43 +567,77 @@ export function attack(monster) {
         if (materialDrop >= monster.materialDropChance) {
             monster.materialDrop();
         }
+        if (monster.class == "calamity") {
+            alert("You have slain the dragon plagueing the village. Your actions have brought hope and revitalized the world. However an ominious mark has been left on you during the battle. A loud shriek from the heavens beckon...")
+            endgameCheck.dragonSlayed = true
+        }
         //Reset encounter
-        update(dungeon[0])
+        update(locations[1])
         monster.health = monster.peakHealth;
         mainButtons.monsterStats.style.display = "none"
         mainButtons.monsterName.style.display = "none"
         mainButtons.monsterHealth.style.display = "none"
-        check = dungeon[0]
+        check = locations[1]
         console.clear()
     }
     
     if (monster.class == "timed") {
         let monsterEscape = Math.round(Math.random()*100)
-        if (monsterEscape > 80) {
+        if (monsterEscape > 95) {
             alert("The monster escaped...")
             update(locations[1])
             monster.health = monster.peakHealth;
             mainButtons.monsterStats.style.display = "none"
             mainButtons.monsterName.style.display = "none"
             mainButtons.monsterHealth.style.display = "none"
+            check = locations[1]
         }
+    }
+    if (playerStatus.health <= 0) {
+        alert("You have died...")
+        location.reload()
     }
 }
 export function defend(monster) {
+
+        armoredApplied = false;
+
         //Defense decimal 
-        let playerDecimalDEF = (playerStatus.def+100)/100;
+        let playerDecimalDEF = ((playerStatus.def+playerStatus.BonusDef)+100)/100;
+        if (armored === true) {
+            playerDecimalDEF+=0.25
+            armoredApplied = true;
+            buffed = true
+        }
         let playerProcentDEF = Math.round((playerDecimalDEF-1)*200)
     
         //Damage formula
-        let monsterDamage = Math.round((Math.random()*monster.atkPower)/playerDecimalDEF)/2
+        let monsterDamage = Math.round(Math.random()*monster.atkPower)
+
+
+        if (monster.health <= (monster.peakHealth)/2) {
+            countdown++
+        }
+        if (countdown == 2) {
+            monsterDamage += monster.peakATKPower*2
+            bigHit++
+        }
+        if (bigHit == 2) {
+            monsterDamage -= monster.peakATKPower*2
+        }
     
         //Accrued damage (player)
-        playerStatus.health -= monsterDamage;
+        playerStatus.health -= (monsterDamage)/playerDecimalDEF;
         mainButtons.healthText.textContent = Math.round(playerStatus.health);
     
         //Battle Info
         text.innerHTML = `MITIGATED: ${playerProcentDEF}% of the attack! <br>
-                          DAMAGE TAKEN: ${monsterDamage}HP`
+                          DAMAGE TAKEN: ${((monsterDamage)/playerDecimalDEF).toFixed(2)}HP`
+        
+    if (playerStatus.health <= 0) {
+        alert("You have died...")
+        location.reload()
+    }
     
 }
 export function run() {
@@ -555,6 +649,9 @@ export function run() {
     monsters.forEach(monster => {
         monster.health = monster.peakHealth
     })
+    slimeCount = 0
+    fangCount = 0
+    garCount = 0
 }
 //Dungeon functions
 export function opt1() {
@@ -564,17 +661,22 @@ export function opt2() {
     update(dungeon[1])
 }
 export function opt3() {
+    update(dungeon[2])
     
 }
 //Enemies
 
+let slimeCount = 0
+
 export function fightSlime() {
+    slimeCount++
+
     let luckDecimal = (playerStatus.luck+100)/100
     
     let rareMobChance = Math.round(Math.random()*(100)*luckDecimal)
     console.log("You rolled ", rareMobChance, " To get a rare encounter");
 
-    if (rareMobChance > 90) {
+    if (rareMobChance >= 95) {
         update(rare[0])
         mainButtons.monsterStats.style.display = "flex"
         mainButtons.monsterName.style.display = "flex"
@@ -588,7 +690,7 @@ export function fightSlime() {
     
         check = rare[0]
     }
-    else {
+    else if (rareMobChance < 95){
         update(monsters[0])
         mainButtons.monsterStats.style.display = "flex"
         mainButtons.monsterName.style.display = "flex"
@@ -602,34 +704,84 @@ export function fightSlime() {
     
         check = monsters[0]
     }
+    if (slimeCount == 5){
+        update(elite[0])
+        mainButtons.monsterStats.style.display = "flex"
+        mainButtons.monsterName.style.display = "flex"
+        mainButtons.monsterHealth.style.display = "flex"
+    
+        monsterHealth.textContent = elite[0].peakHealth
+        monsterName.textContent = elite[0].name
+        monsterDEF.textContent = elite[0].def
+        monsterATK.textContent = elite[0].atkPower
+        monsterAG.textContent = elite[0].ag
+    
+        check = elite[0]
+    }
 }
+let fangCount = 0
 export function fightFang() {
-    update(monsters[1])
-    mainButtons.monsterStats.style.display = "flex"
-    mainButtons.monsterName.style.display = "flex"
-    mainButtons.monsterHealth.style.display = "flex"
-
-    monsterHealth.textContent = monsters[1].peakHealth
-    monsterName.textContent = monsters[1].name
-    monsterDEF.textContent = monsters[1].def
-    monsterATK.textContent = monsters[1].atkPower
-    monsterAG.textContent = monsters[1].ag
-
-    check = monsters[1]
+    fangCount++
+if (fangCount < 5) {
+        update(monsters[1])
+        mainButtons.monsterStats.style.display = "flex"
+        mainButtons.monsterName.style.display = "flex"
+        mainButtons.monsterHealth.style.display = "flex"
+    
+        monsterHealth.textContent = monsters[1].peakHealth
+        monsterName.textContent = monsters[1].name
+        monsterDEF.textContent = monsters[1].def
+        monsterATK.textContent = monsters[1].atkPower
+        monsterAG.textContent = monsters[1].ag
+    
+        check = monsters[1]
 }
-export function fightGargoyle() {
-    update(monsters[2])
+else if (fangCount == 5) {
+    update(elite[1])
     mainButtons.monsterStats.style.display = "flex"
     mainButtons.monsterName.style.display = "flex"
     mainButtons.monsterHealth.style.display = "flex"
 
-    monsterHealth.textContent = monsters[2].peakHealth
-    monsterName.textContent = monsters[2].name
-    monsterDEF.textContent = monsters[2].def
-    monsterATK.textContent = monsters[2].atkPower
-    monsterAG.textContent = monsters[2].ag
+    monsterHealth.textContent = elite[1].peakHealth
+    monsterName.textContent = elite[1].name
+    monsterDEF.textContent = elite[1].def
+    monsterATK.textContent = elite[1].atkPower
+    monsterAG.textContent = elite[1].ag
 
-    check = monsters[2]
+    check = elite[1]
+}
+}
+let garCount = 0
+export function fightGargoyle() {
+    garCount++
+if (garCount < 5) {
+        update(monsters[2])
+        mainButtons.monsterStats.style.display = "flex"
+        mainButtons.monsterName.style.display = "flex"
+        mainButtons.monsterHealth.style.display = "flex"
+    
+        monsterHealth.textContent = monsters[2].peakHealth
+        monsterName.textContent = monsters[2].name
+        monsterDEF.textContent = monsters[2].def
+        monsterATK.textContent = monsters[2].atkPower
+        monsterAG.textContent = monsters[2].ag
+    
+        check = monsters[2]
+}
+else if (garCount == 5) {
+    update(elite[2])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = elite[2].peakHealth
+    monsterName.textContent = elite[2].name
+    monsterDEF.textContent = elite[2].def
+    monsterATK.textContent = elite[2].atkPower
+    monsterAG.textContent = elite[2].ag
+
+    check = elite[2]
+}
 }
 export function fightGolem() {
     update(monsters[3])
@@ -659,8 +811,61 @@ export function fightMagus() {
 
     check = monsters[4]
 }
-export function fightC() {
-    update(monsters[0])
+export function fightReve() {
+    update(monsters[5])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[5].peakHealth
+    monsterName.textContent = monsters[5].name
+    monsterDEF.textContent = monsters[5].def
+    monsterATK.textContent = monsters[5].atkPower
+    monsterAG.textContent = monsters[5].ag
+
+    check = monsters[5]
+}
+export function fightAbom() {
+    update(monsters[6])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[6].peakHealth
+    monsterName.textContent = monsters[6].name
+    monsterDEF.textContent = monsters[6].def
+    monsterATK.textContent = monsters[6].atkPower
+    monsterAG.textContent = monsters[6].ag
+
+    check = monsters[6]
+}
+export function fightStalker() {
+    update(monsters[7])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[7].peakHealth
+    monsterName.textContent = monsters[7].name
+    monsterDEF.textContent = monsters[7].def
+    monsterATK.textContent = monsters[7].atkPower
+    monsterAG.textContent = monsters[7].ag
+
+    check = monsters[7]
+}
+export function fightMimic() {
+    update(monsters[8])
+    mainButtons.monsterStats.style.display = "flex"
+    mainButtons.monsterName.style.display = "flex"
+    mainButtons.monsterHealth.style.display = "flex"
+
+    monsterHealth.textContent = monsters[8].peakHealth
+    monsterName.textContent = monsters[8].name
+    monsterDEF.textContent = monsters[8].def
+    monsterATK.textContent = monsters[8].atkPower
+    monsterAG.textContent = monsters[8].ag
+
+    check = monsters[8]
 }
 //Rare drops
 export function gainSlimeSuit() {
@@ -724,24 +929,64 @@ export function gainScepter() {
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         playerStatus.BonusSt += 3
         playerStatus.BonusDef += 3
-        playerStatus.BonusAg += 15
+        playerStatus.BonusAg += 1
         playerStatus.BonusInt += 15
         ownerShip.ownedMagus = true   
     }
 }
-export function gainDetermination() {
-    if (ownerShip.ownedD === false) {
-        alert("The dragon's demise fills you with determination. Determination to face the future. Max HP+150, All stats+10, XP gained from battles +40%")
-        playerStatus.BonusMaxHealth += 150
+export function gainRevenant() {
+    if (ownerShip.ownedMagus === false) {
+        alert("The fallen warrior salutes and grants you his sword before death. You gained Revenant's longsword. ST+8, DEF+5, AG+2, INT+5")
+        playerStatus.BonusSt += 8
+        playerStatus.BonusDef += 5
+        playerStatus.BonusAg += 2
+        playerStatus.BonusInt += 5
+        ownerShip.ownedRevenant = true   
+    }
+}
+export function gainAbomination() {
+    if (ownerShip.ownedMagus === false) {
+        alert("You flay and slay the putrid abomination, within his carcass a glowing gem glows. You gained Putrid Core. Max HP+200, INT+15")
+        playerStatus.BonusMaxHealth += 200
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusInt += 15
+        ownerShip.ownedAbomination = true   
+    }
+}
+export function gainStalker() {
+    if (ownerShip.ownedMagus === false) {
+        alert("Your stalker has come to and end, upon searching of their carcass you find a disgusting notebook filled with entries about you... You gained Obsessive Diary. Max HP+10, AG+20")
+        playerStatus.BonusMaxHealth += 10
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusAg += 20
+        ownerShip.ownedStalker = true   
+    }
+}
+export function gainMimic() {
+    if (ownerShip.ownedMagus === false) {
+        alert("As the false visage of yourself disintegrates, it's insignia lays undisintegrated. You gained False Hero's insignia. Max HP+50, ST+10, DEF+10, AG+10, INT+10.")
+        playerStatus.BonusMaxHealth += 50
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         playerStatus.BonusSt += 10
         playerStatus.BonusDef += 10
         playerStatus.BonusAg += 10
         playerStatus.BonusInt += 10
+        ownerShip.ownedMimic = true   
+    }
+}
+export function gainDetermination() {
+    if (ownerShip.ownedDragon === false) {
+        alert("The dragon's demise fills you with determination. Determination to face the future. Max HP+150, All stats+15, XP gained from battles +40%")
+        playerStatus.BonusMaxHealth += 150
+        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+        playerStatus.BonusSt += 15
+        playerStatus.BonusDef += 15
+        playerStatus.BonusAg += 15
+        playerStatus.BonusInt += 15
         monsters.forEach(monster => {
             monster.xpYield *= 1.4
         })
-        ownerShip.ownedD = true   
+        ownerShip.ownedDragon = true   
     }
 }
 //Material
@@ -761,19 +1006,43 @@ export function gainGarMats() {
     let luckDecimal = (playerStatus.luck+100)/100
     let amount = Math.round(Math.random()*(4)*luckDecimal);
     materialOwnership.materialGargoyleOwned += amount
-    alert(`You gained ${amount}x Wolf materials!`)
+    alert(`You gained ${amount}x Gargoyle materials!`)
 }
 export function gainRockMats() {
     let luckDecimal = (playerStatus.luck+100)/100
     let amount = Math.round(Math.random()*(2)*luckDecimal);
-    materialOwnership.materialWolfOwned += amount
+    materialOwnership.materialRockOwned += amount
     alert(`You gained ${amount}x Golem materials!`)
 }
 export function gainMagusMats() {
     let luckDecimal = (playerStatus.luck+100)/100
     let amount = Math.round(Math.random()*(1)*luckDecimal);
-    materialOwnership.materialWolfOwned += amount
+    materialOwnership.materialMagusOwned += amount
     alert(`You gained ${amount}x Magus materials!`)
+}
+export function gainReveMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(1)*luckDecimal);
+    materialOwnership.materialReveOwned += amount
+    alert(`You gained ${amount}x Revenant materials!`)
+}
+export function gainAbomMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(1)*luckDecimal);
+    materialOwnership.materialAbomOwned += amount
+    alert(`You gained ${amount}x Abomination materials!`)
+}
+export function gainStalkerMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(1)*luckDecimal);
+    materialOwnership.materialStalkOwned += amount
+    alert(`You gained ${amount}x Stalker materials!`)
+}
+export function gainMimicMats() {
+    let luckDecimal = (playerStatus.luck+100)/100
+    let amount = Math.round(Math.random()*(1)*luckDecimal);
+    materialOwnership.materialMimicOwned += amount
+    alert(`You gained ${amount}x ??? materials!`)
 }
 export function sellMats() {
     let totalAmount = 0
@@ -782,6 +1051,10 @@ export function sellMats() {
     let garOw = materialOwnership.materialGargoyleOwned
     let rockOw = materialOwnership.materialRockOwned
     let magusOw = materialOwnership.materialMagusOwned
+    let reveOw = materialOwnership.materialReveOwned
+    let abomOw = materialOwnership.materialAbomOwned
+    let stalkerOw = materialOwnership.materialStalkOwned
+    let mimicOw = materialOwnership.materialMimicOwned
 
     if (materialOwnership.materialSlimeOwned > 0) {
         playerStatus.gold += materialOwnership.materialSlimeOwned * 3
@@ -813,12 +1086,41 @@ export function sellMats() {
         goldText.textContent = playerStatus.gold
         materialOwnership.materialMagusOwned = 0;
     }
+    if (materialOwnership.materialReveOwned > 0) {
+        playerStatus.gold += materialOwnership.materialReveOwned * 333
+        totalAmount += materialOwnership.materialReveOwned * 333
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialReveOwned = 0;
+    }
+    if (materialOwnership.materialAbomOwned > 0) {
+        playerStatus.gold += materialOwnership.materialAbomOwned * 444
+        totalAmount += materialOwnership.materialAbomOwned * 444
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialAbomOwned = 0;
+    }
+    if (materialOwnership.materialStalkOwned > 0) {
+        playerStatus.gold += materialOwnership.materialStalkOwned * 667
+        totalAmount += materialOwnership.materialStalkOwned * 667
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialStalkOwned = 0;
+    }
+    if (materialOwnership.materialMimicOwned > 0) {
+        playerStatus.gold += materialOwnership.materialMimicOwned * 1250
+        totalAmount += materialOwnership.materialMimicOwned * 1250
+        goldText.textContent = playerStatus.gold
+        materialOwnership.materialMimicOwned = 0;
+    }
     text.innerHTML = `You gained ${totalAmount}G! You sold:<br>
-    ${slimeOw}x Slime material <br>
-    ${wolfOw}x Wolf material <br>
-    ${garOw}x Gargoyle material <br>
-    ${rockOw}x Golem material <br>
-    ${magusOw}x Magus material <br>`;
+    ${slimeOw}x Slime material 3Gx${slimeOw} <br>
+    ${wolfOw}x Wolf material 9Gx${wolfOw} <br>
+    ${garOw}x Gargoyle material 26Gx${garOw} <br>
+    ${rockOw}x Golem material 40Gx${rockOw} <br>
+    ${magusOw}x Magus material 150Gx${magusOw} <br>
+    ${reveOw}x Revenant material 333Gx${reveOw} <br>
+    ${abomOw}x Abomination material 444Gx${abomOw} <br>
+    ${stalkerOw}x Stalker material 667Gx${stalkerOw} <br>
+    ${mimicOw}x ??? material 1250Gx${mimicOw} <br>
+    `;
 
 }
 
@@ -864,7 +1166,7 @@ STPlus.addEventListener("click", function(){
         playerStatus.statPoints--;
         mainButtons.displayStatPoints.textContent = `Available stat points : ${playerStatus.statPoints}`;
         playerStatus.st++;
-        mainButtons.displayST.textContent = `ST : ${playerStatus.st}`;
+        mainButtons.displayST.textContent = `ST : ${(playerStatus.st+playerStatus.BonusSt)}`;
     }
 })
 DEFPlus.addEventListener("click", function(){
@@ -872,7 +1174,7 @@ DEFPlus.addEventListener("click", function(){
         playerStatus.statPoints--;
         mainButtons.displayStatPoints.textContent = `Available stat points : ${playerStatus.statPoints}`;
         playerStatus.def++;
-        mainButtons.displayDEF.textContent = `DEF : ${playerStatus.def}`;
+        mainButtons.displayDEF.textContent = `DEF : ${(playerStatus.def+playerStatus.BonusDef)}`;
     }
 })
 AGPlus.addEventListener("click", function(){
@@ -880,7 +1182,7 @@ AGPlus.addEventListener("click", function(){
         playerStatus.statPoints--;
         mainButtons.displayStatPoints.textContent = `Available stat points : ${playerStatus.statPoints}`;
         playerStatus.ag++;
-        mainButtons.displayAG.textContent = `AG : ${playerStatus.ag}`;
+        mainButtons.displayAG.textContent = `AG : ${(playerStatus.ag+playerStatus.BonusAg)}`;
     }
 })
 INTPlus.addEventListener("click", function(){
@@ -888,7 +1190,7 @@ INTPlus.addEventListener("click", function(){
         playerStatus.statPoints--;
         mainButtons.displayStatPoints.textContent = `Available stat points : ${playerStatus.statPoints}`;
         playerStatus.int++;
-        mainButtons.displayINT.textContent = `INT : ${playerStatus.int}`
+        mainButtons.displayINT.textContent = `INT : ${(playerStatus.int+playerStatus.BonusInt)}`
     }
 })
 
@@ -1257,7 +1559,7 @@ export function empowerment() {
     if (playerStatus.health > 0 && empowered === false) {
         playerStatus.health -= 50
         playerStatus.maxHealth -= 50
-        healthText.textContent = playerStatus.maxHealth
+        healthText.textContent = playerStatus.health
         displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         empowered = true
         durationEm = 5
@@ -1269,7 +1571,7 @@ export function vitalDef() {
     if (playerStatus.health > 0 && armored === false) {
         playerStatus.health -= 50
         playerStatus.maxHealth -= 50
-        healthText.textContent = playerStatus.maxHealth
+        healthText.textContent = playerStatus.health
         displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         armored = true
         durationAr = 5
@@ -1281,7 +1583,7 @@ export function borne() {
     if (playerStatus.health > 0 && bloodBorne === false) {
         playerStatus.health -= 25
         playerStatus.maxHealth -= 25
-        healthText.textContent = playerStatus.maxHealth
+        healthText.textContent = playerStatus.health
         displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         bloodBorne = true
         durationBB = 5
@@ -1290,6 +1592,32 @@ export function borne() {
 }
 export function goldEx() {
     update(exchange[2])
+}
+export function buyHealth() {
+    if (playerStatus.gold >= 800) {
+        playerStatus.gold -= 800
+        mainButtons.goldText.textContent = playerStatus.gold
+
+        playerStatus.maxHealth += 1
+        displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
+
+        text.textContent = `You have gained Max HP+1!`
+    }
+    else {
+        text.textContent = `You don't have enough gold...`
+    }
+}
+export function buyStat() {
+    if (playerStatus.gold >= 3200) {
+        playerStatus.gold -= 3200
+        mainButtons.goldText.textContent = playerStatus.gold
+
+        playerStatus.statPoints += 1
+        text.textContent = `You have gained Stat points+1!`
+    }
+    else {
+        text.textContent = `You don't have enough gold...`
+    }
 }
 export function openInventory() {
     update(inventoryDisplay[0])

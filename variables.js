@@ -103,12 +103,12 @@ export const ownerShip = {
   ownedGargoyle: false,
   ownedGolem: false,
   ownedMagus: false,
-  ownedA: false,
-  ownedB: false,
-  ownedC: false,
-  ownedD: false,
+  ownedRevenant: false,
+  ownedAbomination: false,
+  ownedStalker: false,
+  ownedMimic: false,
 
-  ownede: false,
+  ownedDragon: false,
 };
 
 export const endgameCheck = {
@@ -127,4 +127,8 @@ export const materialOwnership = {
   materialGargoyleOwned: 8,
   materialRockOwned: 0,
   materialMagusOwned: 0,
+  materialReveOwned: 0,
+  materialAbomOwned: 0,
+  materialStalkOwned: 0,
+  materialMimicOwned: 0,
 };
