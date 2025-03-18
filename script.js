@@ -1,4 +1,4 @@
-import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, weaponDisplay, boss, elite} from "./locations.js";
+import { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, weaponDisplay, boss, elite, rareDrops} from "./locations.js";
 import { mainButtons, checkCrit, ownerShip, endgameCheck, materialOwnership, playerStatus } from "./variables.js";
 
     let check = null;
@@ -86,7 +86,7 @@ function startAdventure() {
         playerStatus.def = 3;
         playerStatus.ag = 11;
         playerStatus.int = 10;
-        playerStatus.luck = 50;
+        playerStatus.luck = 25;
 
         bardClass.addEventListener("dblclick", function() {
             update(town[0])
@@ -110,7 +110,7 @@ function startAdventure() {
         playerStatus.def = 4;
         playerStatus.ag = 8;
         playerStatus.int = 10;
-        playerStatus.luck = 20;
+        playerStatus.luck = 5;
 
         rangerClass.addEventListener("dblclick", function() {
             update(town[0])
@@ -161,7 +161,7 @@ export function warriorSelect() {
     playerStatus.def = 7;
     playerStatus.ag = 5;
     playerStatus.int = 4;
-    playerStatus.luck = 10;
+    playerStatus.luck = 3;
     
     mainButtons.shopButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -211,7 +211,7 @@ export function rogueSelect() {
     playerStatus.def = 0;
     playerStatus.ag = 16;
     playerStatus.int = 8;
-    playerStatus.luck = 30;
+    playerStatus.luck = 7;
 
     mainButtons.bossButton.addEventListener("dblclick", function() {
         if (endgameCheck.selectMage === false && endgameCheck.selectWarrior === false && endgameCheck.selectRogue === false) {
@@ -379,7 +379,7 @@ export function attack(monster) {
     console.log("Critroll: "+critRoll);
     console.log("Sparkroll: "+sparkRoll);
 
-if (monster.class == "danger" || monster.class == "calamity") {
+if (monster.class == "danger" || monster.class == "calamity" || monster.class == "elite") {
         if (monster.health <= (monster.peakHealth)/2 && oneTime === false) {
             alert("Your insticts tell you something dangerous is about to happen!")
             oneTime = true
@@ -388,12 +388,12 @@ if (monster.class == "danger" || monster.class == "calamity") {
             countdown++
         }
         if (countdown == 2) {
-            monsterSpeed += monster.ag
+            monsterSpeed += monster.ag*100
             monsterDamage += monster.peakATKPower*2
             bigHit++
         }
         if (bigHit == 2) {
-            monsterSpeed -= monster.ag
+            monsterSpeed -= monster.ag*100
             monsterDamage -= monster.peakATKPower*2
         }
 }
@@ -407,7 +407,7 @@ if (monster.class == "danger" || monster.class == "calamity") {
         `
         mainButtons.monsterHealth.textContent = `${Math.round(monster.health)}`
     }
-    if (playerSpeed > monsterSpeed && checkCrit.achievedCrit === false) {
+    else if (playerSpeed > monsterSpeed && checkCrit.achievedCrit === false) {
         monster.health -= playerStatus.playerDamage
         mainButtons.text.innerHTML = `
         Player Advantage! (Monster Attack evaded)<br>
@@ -553,8 +553,8 @@ if (monster.class == "danger" || monster.class == "calamity") {
         alert(`+${goldGain} Gold\n+${xpGain}XP`)
         let rollDrop = Math.round(Math.random()*(100)*luckDecimal)
         let materialDrop = Math.round(Math.random()*(100)*luckDecimal)
-        let amountTreasure = Math.round(Math.random()*(monster.treasureYield)*luckDecimal)
-        if (rollDrop > 99) {
+        let amountTreasure = Math.round(Math.random()*(monster.treasureYield))
+        if (rollDrop > 90) {
             fortuneGems += amountTreasure;
             alert(`You gained ${amountTreasure}x Fortune gems!`)
         } else if (rollDrop > 66) {
@@ -573,7 +573,18 @@ if (monster.class == "danger" || monster.class == "calamity") {
         }
         //Reset encounter
         update(locations[1])
-        monster.health = monster.peakHealth;
+        monsters.forEach(monster => {
+            monster.health = monster.peakHealth;
+
+        })
+        elite.forEach(monster => {
+            monster.health = monster.peakHealth;
+
+        })
+        boss.forEach(monster => {
+            monster.health = monster.peakHealth;
+
+        })
         mainButtons.monsterStats.style.display = "none"
         mainButtons.monsterName.style.display = "none"
         mainButtons.monsterHealth.style.display = "none"
@@ -642,12 +653,19 @@ export function defend(monster) {
 }
 export function run() {
     update(town[0])
+    check = town[0]
     mainButtons.monsterStats.style.display = "none"
     mainButtons.monsterName.style.display = "none"
     mainButtons.monsterHealth.style.display = "none"
     //Shuffles through monster array and resets each monster health to peak
     monsters.forEach(monster => {
         monster.health = monster.peakHealth
+    })
+    elite.forEach(elite => {
+        elite.health = elite.peakHealth
+    })
+    boss.forEach(boss => {
+        boss.health = boss.peakHealth
     })
     slimeCount = 0
     fangCount = 0
@@ -676,7 +694,7 @@ export function fightSlime() {
     let rareMobChance = Math.round(Math.random()*(100)*luckDecimal)
     console.log("You rolled ", rareMobChance, " To get a rare encounter");
 
-    if (rareMobChance >= 95) {
+    if (rareMobChance >= 90) {
         update(rare[0])
         mainButtons.monsterStats.style.display = "flex"
         mainButtons.monsterName.style.display = "flex"
@@ -893,6 +911,15 @@ export function gainTreasureSlimeTreasure() {
         ownerShip.ownedSlime = true   
     }
 }
+export function gainBarbedSlime() {
+    if (ownerShip.ownedBarbed === false) {
+        alert("You have gained the barbed slime's spikes. ST+5, DEF+10, INT+3")
+        playerStatus.BonusSt += 5
+        playerStatus.BonusDef += 10
+        playerStatus.BonusInt += 3
+        ownerShip.ownedBarbed = true   
+    }
+}
 export function gainWolfSoul() {
     if (ownerShip.ownedWolf === false) {
         alert("From the spirit of the wolf, you gained the wolf soul. ST+3, AG+6, INT+3")
@@ -900,6 +927,15 @@ export function gainWolfSoul() {
         playerStatus.BonusAg += 6
         playerStatus.BonusInt += 3
         ownerShip.ownedWolf = true   
+    }
+}
+export function gainPatriarch() {
+    if (ownerShip.ownedPatriarch === false) {
+        alert("From the spirit of the wolf patriarch, you gained the Kingly Bestial Soul. ST+12, AG+14, INT+8")
+        playerStatus.BonusSt += 12
+        playerStatus.BonusAg += 14
+        playerStatus.BonusInt += 8
+        ownerShip.ownedPatriarch = true   
     }
 }
 export function gainGargoyle() {
@@ -911,22 +947,28 @@ export function gainGargoyle() {
         ownerShip.ownedGargoyle = true   
     }
 }
+export function gainArchgoyle() {
+    if (ownerShip.ownedArchgoyle === false) {
+        alert("As the archgoyle shatters into pieces, it's horns stay, you gained Archgoyle horns. ST+5, DEF+5, AG+8, INT+15,")
+        playerStatus.BonusSt += 5
+        playerStatus.BonusDef += 5
+        playerStatus.BonusAg += 8
+        playerStatus.BonusInt += 15
+        ownerShip.ownedArchgoyle = true   
+    }
+}
 export function gainStoneFist() {
     if (ownerShip.ownedGolem === false) {
-        alert("The golem crumbles and reveals a hidden gemstone, Max HP+150, ST+4, DEF+2, INT+2")
-        playerStatus.BonusMaxHealth += 150
-        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
-        playerStatus.BonusSt += 4
+        alert("The golem crumbles and reveals a hidden gemstone, ST+6, DEF+2, INT+12")
+        playerStatus.BonusSt += 6
         playerStatus.BonusDef += 2
-        playerStatus.BonusInt += 2
+        playerStatus.BonusInt += 12
         ownerShip.ownedGolem = true   
     }
 }
 export function gainScepter() {
     if (ownerShip.ownedMagus === false) {
         alert("The magus drops his scepter. You gained Scepter. ST+3, DEF+3, AG+1, INT+15")
-        playerStatus.BonusMaxHealth += 150
-        mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         playerStatus.BonusSt += 3
         playerStatus.BonusDef += 3
         playerStatus.BonusAg += 1
@@ -955,7 +997,7 @@ export function gainAbomination() {
 }
 export function gainStalker() {
     if (ownerShip.ownedMagus === false) {
-        alert("Your stalker has come to and end, upon searching of their carcass you find a disgusting notebook filled with entries about you... You gained Obsessive Diary. Max HP+10, AG+20")
+        alert("Your stalker has come to and end, upon searching of their carcass you find a disgusting notebook filled with entries about you... You gained, and casted aside the Obsessive Diary... Max HP+10, AG+20")
         playerStatus.BonusMaxHealth += 10
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         playerStatus.BonusAg += 20
@@ -1231,6 +1273,9 @@ export function zweiHander() {
     else if (playerStatus.gold < 300) {
         text.textContent = "You don't have enough gold..."
     }
+    else {
+        text.textContent = `You already have this weapon.`
+    }
 }
 export function shortBow() {
     if (playerStatus.gold >= 200 && ownerShip.ownedShort == false) {
@@ -1246,6 +1291,9 @@ export function shortBow() {
     else if (playerStatus.gold < 200) {
         text.textContent = "You don't have enough gold..."
     }
+    else {
+        text.textContent = `You already have this weapon.`
+    }
 }
 export function magicWand() {
     if (playerStatus.gold >= 500 && ownerShip.ownedWand == false) {
@@ -1260,6 +1308,9 @@ export function magicWand() {
     }
     else if (playerStatus.gold < 500) {
         text.textContent = "You don't have enough gold..."
+    }
+    else {
+        text.textContent = `You already have this weapon.`
     }
 }
 export function rareKatana() {
@@ -1278,6 +1329,9 @@ export function rareKatana() {
     else if (playerStatus.gold < 1200) {
         text.textContent = "You don't have enough gold..."
     }
+    else {
+        text.textContent = `You already have this weapon.`
+    }
 }
 export function clayMore() {
     if (playerStatus.gold >= 1800 && ownerShip.ownedClay == false) {
@@ -1292,6 +1346,9 @@ export function clayMore() {
     }
     else if (playerStatus.gold < 1800) {
         text.textContent = "You don't have enough gold..."
+    }
+    else {
+        text.textContent = `You already have this weapon.`
     }
 }
 export function gemStaff() {
@@ -1308,6 +1365,9 @@ export function gemStaff() {
     else if (playerStatus.gold < 2500) {
         text.textContent = "You don't have enough gold..."
     }
+    else {
+        text.textContent = `You already have this weapon.`
+    }
 }
 export function greatestSword() {
     if (playerStatus.gold >= 8000 && ownerShip.ownedGreat == false) {
@@ -1322,6 +1382,9 @@ export function greatestSword() {
     }
     else if (playerStatus.gold < 8000) {
         text.textContent = "You don't have enough gold..."
+    }
+    else {
+        text.textContent = `You already have this weapon.`
     }
 }
 export function shadowBow() {
@@ -1338,6 +1401,9 @@ export function shadowBow() {
     }
     else if (playerStatus.gold < 7700) {
         text.textContent = "You don't have enough gold..."
+    }
+    else {
+        text.textContent = `You already have this weapon.`
     }
 }
 export function mechanicalStaff() {
@@ -1356,17 +1422,20 @@ export function mechanicalStaff() {
     else if (playerStatus.gold < 15000) {
         text.textContent = "You don't have enough gold..."
     }
+    else {
+        text.textContent = `You already have this weapon.`
+    }
 }
 export function healPot() {
     let healAmount = 20;
     let newHealth = playerStatus.health + healAmount
     if (playerStatus.gold >= 30 && playerStatus.health < (playerStatus.maxHealth+playerStatus.BonusMaxHealth)) {
         playerStatus.health += healAmount
-        healthText.textContent = playerStatus.health
+        healthText.textContent = Math.round(playerStatus.health)
         playerStatus.gold -= 20;
         if (newHealth > (playerStatus.maxHealth+playerStatus.BonusMaxHealth)) {
             playerStatus.health = (playerStatus.maxHealth+playerStatus.BonusMaxHealth)
-            healthText.textContent = playerStatus.health
+            healthText.textContent = Math.round(playerStatus.health)
         }
         goldText.textContent = playerStatus.gold
     }
@@ -1621,6 +1690,7 @@ export function buyStat() {
 }
 export function openInventory() {
     update(inventoryDisplay[0])
+    removeExtra()
 }
 export function openWeapons() {
     update(inventoryDisplay[1])
@@ -1788,9 +1858,9 @@ export function useHeal() {
         healingStones--
         playerStatus.maxHealth += 1
         playerStatus.health += 1
-        healthText.textContent = playerStatus.health
+        healthText.textContent = Math.round(playerStatus.health)
         displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
-        text.textContent = `You gained Max HP+3! You have ${healingStones}x health stones left.`
+        text.textContent = `You gained Max HP+1! You have ${healingStones}x health stones left.`
     }
     else {
         text.textContent = `You don't have any healing stones left.`
@@ -1805,10 +1875,10 @@ export function useGems() {
             playerStatus.luck += 1
         }
         playerStatus.gold += amountGold
-        healthText.textContent = playerStatus.health
+        healthText.textContent = Math.round(playerStatus.health)
         displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
         goldText.textContent = playerStatus.gold
-        text.textContent = `Luck increased, Max HP+10 and recieved ${amountGold}! You have ${fortuneGems}x fortune gems left.`
+        text.textContent = `Luck increased, Max HP+10 and recieved ${amountGold}G! You have ${fortuneGems}x fortune gems left.`
     }
     else {
         text.textContent = `You don't have any fortune gems left.`
@@ -1882,28 +1952,247 @@ export function XPboost() {
         text.textContent = `You have already sacrificed enough.`
     }
 }
-export function openKey() {
+function removeExtra() {
+    let existingSpecial = document.getElementById("specialInspect")
+    let existingElite = document.getElementById("eliteInspect")
+    let existingBoss = document.getElementById("bossInspect")
+
+    if (existingSpecial) {
+        existingSpecial.remove()
+    }
+    if (existingElite) {
+        existingElite.remove()
+    }
+    if (existingBoss) {
+        existingBoss.remove()
+    }
+}
+export function openRare() {
     update(inventoryDisplay[3])
+    let special = document.createElement("button")
+    special.textContent = "Special"
+    special.setAttribute("id", "specialInspect")
+    special.style.marginRight = "5px"
+
+    mainButtons.mainButtons.append(special)
+
+    let specialInspect = document.getElementById("specialInspect")
+
+    specialInspect.addEventListener("click", function() {
+        update(rareDrops[3])
+        if (ownerShip.ownedTreasureSlime === true) {
+            mainButtons.shopButton.textContent = `Treasure Slime's treasure`
+        }
+        removeExtra()
+    })
+
+    let elite = document.createElement("button")
+    elite.textContent = "Elite"
+    elite.setAttribute("id", "eliteInspect")
+    elite.style.marginRight = "5px"
+
+    mainButtons.mainButtons.append(elite)
+
+    let eliteInspect = document.getElementById("eliteInspect")
+
+    eliteInspect.addEventListener("click", function() {
+        update(rareDrops[4])
+        if (ownerShip.ownedBarbed === true) {
+            mainButtons.shopButton.textContent = `Barbed Spike`
+        }
+        if (ownerShip.ownedPatriarch === true) {
+            mainButtons.dungeonButton.textContent = `Kingly Bestial Soul`
+        }
+        if (ownerShip.ownedArchgoyle === true) {
+            mainButtons.bossButton.textContent = `Archgoyle Horns`
+        }
+        removeExtra()
+    })
+
+    let boss = document.createElement("button")
+    boss.textContent = "Boss"
+    boss.setAttribute("id", "bossInspect")
+    boss.style.marginRight = "5px"
+
+    mainButtons.mainButtons.append(boss)
+
+    let bossInspect = document.getElementById("bossInspect")
+
+    bossInspect.addEventListener("click", function() {
+        update(rareDrops[5])
+        if (ownerShip.ownedDragon === true) {
+            mainButtons.shopButton.textContent = `Determination`
+        }
+        removeExtra()
+    })
 }
-export function inspectInsignia() {
-    text.innerHTML = `"An insignia proving your honor as the hero who saved the world."`
-    mainButtons.visual.src = "./Images/Fire.png"
-}
-export function inspectMark() {
-    if (endgameCheck.dragonSlayed === true) {
-    text.innerHTML = `"An otherwordly mark placed on your soul upon defeat of the calamity, a call was heard upon this item's gain..."`
-    mainButtons.visual.src = "./Images/dragon.jpg"
-}
-else {
-    text.textContent = "You haven't obtained this item"
-}
-}
-export function inspectCosmic() {
-    if (endgameCheck.destroyerSlayed == true) {
-        text.innerHTML = `"A glowing relic of cosmic power, gained by triumph over the universal threat, its diminished power serves no benefit to your otherwordly strength, however by tapping into its power you can harness the fabric of space and time and fight once more the plague of reality."`
-        mainButtons.visual.src = "./Images/destroyer.jpg"
+
+export function inspectTreasureSlime() {
+    if (ownerShip.ownedTreasureSlime === true) {
+        text.textContent = `The treasure slime's coveted treasure. You have hoarded some interesting stuff from the pile, mostly gems, but at the center of the pile a mystical orb, radiating what seems to be life energy. Bonus Max HP+50, All stats+2, Gold gained +10%`
+        mainButtons.visual.src = "./Images/invdis.jpg"
     }
-    else if (endgameCheck.destroyerSlayed == false) {
-        text.innerHTML = `You do not own this artifact`
+    else {
+        text.textContent = `You don't have this item.`
     }
+}
+export function inspectBarbedSlime() {
+    if (ownerShip.ownedBarbed === true) {
+        text.textContent = `A sharp and steadfast spike, harvested from the carcass of the elite variant of slime, the Barbed Slime. Slime scholars say that from traveling the dungeon for many years, the common variant of slime evolved to it's environment, this giving birth to the Barbed Slime. ST+5, DEF+10, INT+3`
+        mainButtons.visual.src = "./Images/wand.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectKingSoul() {
+    if (ownerShip.ownedPatriarch === true) {
+        text.textContent = `The death of the Fanged Pack's patriarch has granted you with the Kingly Bestial Soul, differing from it's common variant, it grants it's user with heightened strength and courage, truly fit for a king. ST+12, AG+14, INT+8`
+        mainButtons.visual.src = "./Images/patriarch.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectArchgoyle() {
+    if (ownerShip.ownedArchgoyle === true) {
+        text.textContent = `Horns that once lay atop the might Archgoyle. Dawning this piece radiates demonic energy throughout your entire self, however with great courage and willpower which comes from being the Hero, instead grants you unleashed strength. ST+5, DEF+5, AG+8, INT+15,`
+        mainButtons.visual.src = "./Images/archgoyle.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectDragon() {
+    if (ownerShip.ownedDragon === true) {
+        text.textContent = `You have been rewarded the Determination upon defeat of this calamity. Although the gauntlet holds no special effect, your determination surges true within. Bonus Max HP+150, All stats+15, XP gained from battles +40%`
+        mainButtons.visual.src = "./Images/determination.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectOpt1() {
+    update(rareDrops[0])
+    removeExtra()
+    if (ownerShip.ownedSlime === true) {
+        mainButtons.shopButton.textContent = `Slime Drapes`
+    }
+    if (ownerShip.ownedWolf === true) {
+        mainButtons.dungeonButton.textContent = `Bestial Soul`
+    }
+    if (ownerShip.ownedGargoyle === true) {
+        mainButtons.bossButton.textContent = `Gargoyle Helm`
+    }
+}
+export function inspectSlime() {
+    if (ownerShip.ownedSlime === true) {
+        text.textContent = `The slime drapes grant you with Bonus Max HP+100, and DEF+10. Sourced from the carcass of a worthy slime, dawning this piece grants you defensive capabilties due to their sliminess and viscosity.`
+        mainButtons.visual.src = "./Images/drape.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectWolf() {
+    if (ownerShip.ownedWolf === true) {
+        text.textContent = `The bestial soul symbolizes the worthyness to lead the Fanged Beast Pack. However this only applies to members of the same kind. Harnessing this power to your avail boosts your ST+3, AG+6, INT+6.`
+        mainButtons.visual.src = "./Images/soul.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectGargoyle() {
+    if (ownerShip.ownedGargoyle === true) {
+        text.textContent = `The helmet of a fallen gargoyle represents the lifeforce within these inanimate creatures. The helmet grants you with ST+5, DEF+8, INT+8.`
+        mainButtons.visual.src = "./Images/helm.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectOpt2() {
+    update(rareDrops[1])
+    removeExtra()
+    if (ownerShip.ownedGolem === true) {
+        mainButtons.shopButton.textContent = `Golem Core`
+    }
+    if (ownerShip.ownedMagus === true) {
+        mainButtons.dungeonButton.textContent = `Scepter`
+    }
+    if (ownerShip.ownedRevenant === true) {
+        mainButtons.bossButton.textContent = `Revenant's longsword`
+    }
+}
+export function inspectGolem() {
+    if (ownerShip.ownedGolem === true) {
+        text.textContent = `The golem core stands as the lynchpin of the power source which fuels the creature. Inspecting the meticulous invention has granted you inspiration. ST+6, DEF+2, INT+12 `
+        mainButtons.visual.src = "./Images/core.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectMagus() {
+    if (ownerShip.ownedMagus === true) {
+        text.textContent = `The Magus Scepter is an ancient staff, with a crystal at the forefront of the scepter. The crystal commands necromancy from inanimate objects, however with the death of the magus it's power is no longer. ST+3, DEF+3, AG+1, INT+15`
+        mainButtons.visual.src = "./Images/scepter.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectRevenant() {
+    if (ownerShip.ownedRevenant === true) {
+        text.textContent = `The revenant's longsword, bequeathed by a once mighty warrior, however turned into a revenant. The longsword's power hasn't diminshed from it's prime, and with a new wielder it's purpose is not yet diminished. ST+8, DEF+5, AG+2, INT+5.`
+        mainButtons.visual.src = "./Images/longsword.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectOpt3() {
+    update(rareDrops[2])
+    removeExtra()
+    if (ownerShip.ownedAbomination === true) {
+        mainButtons.shopButton.textContent = `Abomination Core`
+    }
+    if (ownerShip.ownedStalker === true) {
+        mainButtons.dungeonButton.textContent = `Obsessive Diary`
+    }
+    if (ownerShip.ownedMimic === true) {
+        mainButtons.bossButton.textContent = `False Hero's insignia`
+    }
+}
+export function inspectAbomination() {
+    if (ownerShip.ownedAbomination === true) {
+        text.textContent = `The fallen abominations core, once resided deep within it's putrid flesh, it now belongs to you and shines radiantly, seemingly purified from the corruption. Bonus Max HP+200, INT+15`
+        mainButtons.visual.src = "./Images/core2.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectStalker() {
+    if (ownerShip.ownedStalker === true) {
+        text.textContent = `An obsessive diary left behind by your fallen stalker... For some reason it lingers on your mind. Although the book discarded, it's contents remain... Bonus Max HP+20, AG+20`
+        mainButtons.visual.src = "./Images/diary.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+export function inspectMimic() {
+    if (ownerShip.ownedMimic === true) {
+        text.textContent = `A false hero's insignia replicated by the Doppelganger. Although it's remains have vanished, this insignia still remains. Perhaps a longing to be the true hero? Bonus Max HP+50, ST+10, DEF+10, AG+10, INT+10.`
+        mainButtons.visual.src = "./Images/insignia.jpg"
+    }
+    else {
+        text.textContent = `You don't have this item.`
+    }
+}
+
+export function placeHolder() {
+
 }

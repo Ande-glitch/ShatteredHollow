@@ -1,5 +1,5 @@
 //Game mechanics
-import { goStore, goCave, goBoss, goTown, goCheck, treasure, statboost, mystery, buyCrit, XPboost, inspectZwei, inspectShortbow, inspectWand, inspectKat, inspectClay, inspectGem, inspectGreat, inspectShadow, inspectMech,} from "./script.js";
+import { goStore, goCave, goBoss, goTown, goCheck, treasure, statboost, mystery, buyCrit, XPboost, inspectZwei, inspectShortbow, inspectWand, inspectKat, inspectClay, inspectGem, inspectGreat, inspectShadow, inspectMech, gainBarbedSlime, gainPatriarch, gainArchgoyle, inspectBarbedSlime, inspectKingSoul, inspectArchgoyle, } from "./script.js";
 import { opt1, opt2, opt3 } from "./script.js";
 import { attack, defend, run} from "./script.js";
 //Roles
@@ -25,9 +25,10 @@ import { fightAbom,fightStalker,fightMimic } from "./script.js";
 import { gainSlimeSuit,gainTreasureSlimeTreasure,gainWolfSoul,gainGargoyle,gainStoneFist,gainScepter, gainRevenant, gainAbomination, gainStalker, gainMimic, gainDetermination } from "./script.js";
 import { gainSlimeMats,gainWolfMats,gainGarMats,gainRockMats,gainMagusMats, gainReveMats, gainAbomMats, gainStalkerMats, gainMimicMats } from "./script.js";
 //Inventory
-import { openInventory, openWeapons,openKey,openConsumables } from "./script.js";
+import { openInventory, openWeapons, openRare,openConsumables } from "./script.js";
 import { checkCommon, checkRare, checkLeg } from "./script.js";
-import { inspectInsignia, inspectMark, inspectCosmic } from "./script.js";
+import { inspectOpt1, inspectOpt2, inspectOpt3, } from "./script.js";
+import { inspectSlime, inspectWolf, inspectGargoyle, inspectGolem, inspectMagus, inspectRevenant, inspectAbomination, inspectStalker, inspectMimic, inspectTreasureSlime, placeHolder, inspectDragon, } from "./script.js";
 import { useChest,useHeal,useGems } from "./script.js";
 import { playerStatus } from "./variables.js";
 
@@ -206,7 +207,7 @@ const monsters = [
         ag: 75,
         peakAg: 75,
         rareDrop: gainWolfSoul,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainWolfMats,
         materialDropChance: 40,
         treasureYield: 6,
@@ -229,7 +230,7 @@ const monsters = [
         ag: 50,
         peakAg: 50,
         rareDrop: gainGargoyle,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainGarMats,
         materialDropChance: 40,
         treasureYield: 10,
@@ -252,7 +253,7 @@ const monsters = [
         ag: 10,
         peakAg: 10,
         rareDrop: gainStoneFist,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainRockMats,
         materialDropChance: 50,
         treasureYield: 12,
@@ -275,7 +276,7 @@ const monsters = [
         ag: 60,
         peakAg: 60,
         rareDrop: gainScepter,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainMagusMats,
         materialDropChance: 75,
         treasureYield: 16,
@@ -298,14 +299,14 @@ const monsters = [
         ag: 50,
         peakAg: 50,
         rareDrop: gainRevenant,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainReveMats,
         materialDropChance: 75,
         treasureYield: 24,
         "button text": ["Attack", "Defend", "Run"],
         "button functions": [() => attack(monsters[5]), () => defend(monsters[5]), run],
-        text: "A ghoul stand sharply and raises his sword against you, it appears to be a revenant.",
-        source: "./Images/magus.jpg"
+        text: "A ghoul stand sharply and raises his sword against you, it appears to be a dragnant.",
+        source: "./Images/revenant.jpg"
     },
     {
         name: "Abomination",
@@ -321,7 +322,7 @@ const monsters = [
         ag: 45,
         peakAg: 45,
         rareDrop: gainAbomination,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainAbomMats,
         materialDropChance: 75,
         treasureYield: 18,
@@ -344,7 +345,7 @@ const monsters = [
         ag: 120,
         peakAg: 120,
         rareDrop: gainStalker,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainStalkerMats,
         materialDropChance: 75,
         treasureYield: 32,
@@ -367,7 +368,7 @@ const monsters = [
         ag: 100,
         peakAg: 100,
         rareDrop: gainMimic,
-        rareDropChance: 90,
+        rareDropChance: 98,
         materialDrop: gainMimicMats,
         materialDropChance: 75,
         treasureYield: 50,
@@ -393,7 +394,7 @@ const rare = [
         ag: 10,
         peakAg: 10,
         rareDrop: gainTreasureSlimeTreasure,
-        rareDropChance: 75,
+        rareDropChance: 98,
         materialDrop: gainSlimeMats,
         materialDropChance: 0,
         treasureYield: 50,
@@ -418,8 +419,8 @@ const elite = [
         xpYield: 2000,
         ag: 40,
         peakAg: 40,
-        rareDrop: gainSlimeSuit,
-        rareDropChance: 50,
+        rareDrop: gainBarbedSlime,
+        rareDropChance: 98,
         materialDrop: gainSlimeMats,
         materialDropChance: 10,
         treasureYield: 6,
@@ -441,8 +442,8 @@ const elite = [
         xpYield: 15000,
         ag: 100,
         peakAg: 100,
-        rareDrop: gainWolfSoul,
-        rareDropChance: 10,
+        rareDrop: gainPatriarch,
+        rareDropChance: 98,
         materialDrop: gainWolfMats,
         materialDropChance: 10,
         treasureYield: 15,
@@ -464,8 +465,8 @@ const elite = [
         xpYield: 15000,
         ag: 90,
         peakAg: 90,
-        rareDrop: gainGargoyle,
-        rareDropChance: 10,
+        rareDrop: gainArchgoyle,
+        rareDropChance: 98,
         materialDrop: gainGarMats,
         materialDropChance: 10,
         treasureYield: 15,
@@ -492,6 +493,7 @@ const boss = [
         peakAg: 150,
         rareDrop: gainDetermination,
         rareDropChance: 0,
+        treasureYield: 100,
         "button text": ["Attack", "Defend", "Run"],
         "button functions": [() => attack(boss[0]), () => defend(boss[0]), run],
         text: "The calamity stands before you",
@@ -531,7 +533,7 @@ const inventoryDisplay = [
     {
         name: "Inventory",
         "button text": ["Display Weapons", "Display Consumables", "Display Key Items"],
-        "button functions": [openWeapons, openConsumables, openKey, goCheck],
+        "button functions": [openWeapons, openConsumables, openRare, goCheck],
         text: "You opened your inventory",
         source: "./Images/inventory.jpg",
     },
@@ -550,9 +552,9 @@ const inventoryDisplay = [
         source: "./Images/inventory.jpg",
     },
     {
-        name: "Inventory",
-        "button text": ["Hero's insignia", "Dragon's Mark", "???"],
-        "button functions": [inspectInsignia, inspectMark, inspectCosmic,openInventory],
+        name: "Rare drops",
+        "button text": ["Option 1", "Option 2", "Option 3"],
+        "button functions": [inspectOpt1, inspectOpt2, inspectOpt3,openInventory],
         text: "You opened your inventory",
         source: "./Images/inventory.jpg",
     },
@@ -605,4 +607,49 @@ const consumables = [
         source: "./Images/inventory.jpg",
     },
 ]
-export { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, elite, boss, weaponDisplay};
+
+const rareDrops = [
+    {
+        name: "Opt 1",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectSlime, inspectWolf, inspectGargoyle,openRare],
+        text: "First layer",
+        source: "./Images/inventory.jpg",
+    },
+    {
+        name: "Opt 2",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectGolem, inspectMagus, inspectRevenant,openRare],
+        text: "Second layer",
+        source: "./Images/inventory.jpg",
+    },
+    {
+        name: "Opt 3",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectAbomination, inspectStalker, inspectMimic,openRare],
+        text: "Third layer",
+        source: "./Images/inventory.jpg",
+    },
+    {
+        name: "Special",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectTreasureSlime, placeHolder, placeHolder,openRare],
+        text: "Special layer",
+        source: "./Images/inventory.jpg",
+    },
+    {
+        name: "Elite",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectBarbedSlime, inspectKingSoul, inspectArchgoyle,openRare],
+        text: "Elite layer",
+        source: "./Images/inventory.jpg",
+    },
+    {
+        name: "Boss",
+        "button text": ["???", "???", "???"],
+        "button functions": [inspectDragon, placeHolder, placeHolder,openRare],
+        text: "Third layer",
+        source: "./Images/inventory.jpg",
+    },
+]
+export { town, locations, weapons, potions, exchange, monsters, dungeon, role, inventoryDisplay, consumables, rare, elite, boss, weaponDisplay, rareDrops};
