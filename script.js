@@ -977,7 +977,7 @@ export function gainScepter() {
     }
 }
 export function gainRevenant() {
-    if (ownerShip.ownedMagus === false) {
+    if (ownerShip.ownedRevenant === false) {
         alert("The fallen warrior salutes and grants you his sword before death. You gained Revenant's longsword. ST+8, DEF+5, AG+2, INT+5")
         playerStatus.BonusSt += 8
         playerStatus.BonusDef += 5
@@ -987,7 +987,7 @@ export function gainRevenant() {
     }
 }
 export function gainAbomination() {
-    if (ownerShip.ownedMagus === false) {
+    if (ownerShip.ownedAbomination === false) {
         alert("You flay and slay the putrid abomination, within his carcass a glowing gem glows. You gained Putrid Core. Max HP+200, INT+15")
         playerStatus.BonusMaxHealth += 200
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
@@ -996,7 +996,7 @@ export function gainAbomination() {
     }
 }
 export function gainStalker() {
-    if (ownerShip.ownedMagus === false) {
+    if (ownerShip.ownedStalker === false) {
         alert("Your stalker has come to and end, upon searching of their carcass you find a disgusting notebook filled with entries about you... You gained, and casted aside the Obsessive Diary... Max HP+10, AG+20")
         playerStatus.BonusMaxHealth += 10
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
@@ -1005,7 +1005,7 @@ export function gainStalker() {
     }
 }
 export function gainMimic() {
-    if (ownerShip.ownedMagus === false) {
+    if (ownerShip.ownedMimic === false) {
         alert("As the false visage of yourself disintegrates, it's insignia lays undisintegrated. You gained False Hero's insignia. Max HP+50, ST+10, DEF+10, AG+10, INT+10.")
         playerStatus.BonusMaxHealth += 50
         mainButtons.displayMaxHealth.textContent = `/${(playerStatus.maxHealth+playerStatus.BonusMaxHealth)}`
